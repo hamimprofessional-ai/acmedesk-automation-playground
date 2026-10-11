@@ -35,7 +35,7 @@ export function DelayedAsyncChallenge() {
         'Click "Refresh report" and wait for the new result (button is disabled while pending).',
         'Capture the secret token — it appears at a random time between 2s and 6s.',
       ]}
-      selector='getByTestId("slow-report-row") within the loaded table'
+      selector='table tr.row'
     >
       <div className="space-y-5">
         <div className="flex items-center justify-between">
@@ -43,7 +43,6 @@ export function DelayedAsyncChallenge() {
           <button
             type="button"
             className="btn-secondary"
-            data-testid="refresh-report"
             disabled={isFetching}
             onClick={() => refetch()}
           >
@@ -52,20 +51,20 @@ export function DelayedAsyncChallenge() {
         </div>
 
         {isLoading || !data ? (
-          <div className="space-y-2" data-testid="slow-skeleton" aria-busy="true">
+          <div className="skeleton space-y-2" aria-busy="true">
             {[0, 1, 2, 3].map((i) => (
               <div key={i} className="h-9 animate-pulse rounded-md bg-slate-200 dark:bg-slate-800" />
             ))}
           </div>
         ) : (
-          <div className="space-y-2" data-testid="slow-report">
+          <div className="report space-y-2">
             <p className="text-xs text-slate-400">
               served in {data.latencyMs} ms at {new Date(data.servedAt).toLocaleTimeString()}
             </p>
             <table className="w-full text-sm">
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {data.items.map((row) => (
-                  <tr key={row.id} data-testid="slow-report-row">
+                  <tr key={row.id} className="row">
                     <td className="py-2">{row.label}</td>
                     <td className="py-2 text-end font-mono text-slate-500">{row.value}</td>
                   </tr>
@@ -78,11 +77,11 @@ export function DelayedAsyncChallenge() {
         <div className="rounded-lg bg-slate-50 p-3 text-sm dark:bg-slate-800/50">
           Secret token:{' '}
           {secret ? (
-            <code className="font-mono text-emerald-600 dark:text-emerald-400" data-testid="delayed-secret">
+            <code className="result font-mono text-emerald-600 dark:text-emerald-400">
               {secret}
             </code>
           ) : (
-            <span className="text-slate-400" data-testid="delayed-secret-pending">
+            <span className="result muted text-slate-400">
               not revealed yet…
             </span>
           )}

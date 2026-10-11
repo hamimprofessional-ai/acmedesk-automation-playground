@@ -8,7 +8,7 @@ export function ChallengeDetail() {
   if (!challenge) {
     return (
       <div className="mx-auto max-w-xl space-y-4 py-16 text-center">
-        <h1 className="text-xl font-semibold" data-testid="page-title">
+        <h1 className="text-xl font-semibold">
           Challenge not found
         </h1>
         <p className="text-sm text-slate-500">No challenge matches “{slug}”.</p>

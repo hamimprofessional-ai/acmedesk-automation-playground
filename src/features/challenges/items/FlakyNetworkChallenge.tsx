@@ -61,26 +61,25 @@ export function FlakyNetworkChallenge() {
         'Keep retrying the rate-limited endpoint until it returns 200.',
         'Trigger the slow endpoint and observe the client-side timeout, then re-test for the intermittent callout.',
       ]}
-      selector='getByTestId("flaky-retry") / "rate-limit-retry"'
+      selector='button:has-text("Load balance")'
     >
       <div className="grid gap-4 sm:grid-cols-2">
         <section className="space-y-2 rounded-lg border border-slate-200 p-4 dark:border-slate-700">
           <h2 className="text-sm font-medium">Account balance</h2>
           <p className="text-xs text-slate-400">Fails ~50% (HTTP 500). Attempts: {flaky.tries}</p>
           {flaky.phase === 'ok' && (
-            <p className="font-mono text-emerald-600 dark:text-emerald-400" data-testid="flaky-value">
+            <p className="result font-mono text-emerald-600 dark:text-emerald-400">
               ${flaky.value?.toFixed(2)}
             </p>
           )}
           {flaky.phase === 'error' && (
-            <p className="text-sm text-rose-600 dark:text-rose-400" data-testid="flaky-error">
+            <p className="result error text-sm text-rose-600 dark:text-rose-400">
               {flaky.message}
             </p>
           )}
           <button
             type="button"
             className="btn-secondary"
-            data-testid="flaky-retry"
             disabled={flaky.phase === 'loading'}
             onClick={loadFlaky}
           >
@@ -92,19 +91,18 @@ export function FlakyNetworkChallenge() {
           <h2 className="text-sm font-medium">Rate-limited endpoint</h2>
           <p className="text-xs text-slate-400">Rejects the first 2 calls with 429. Attempts: {limited.tries}</p>
           {limited.phase === 'ok' && (
-            <p className="text-emerald-600 dark:text-emerald-400" data-testid="rate-limit-value">
+            <p className="result text-emerald-600 dark:text-emerald-400">
               Loaded after retries ✓
             </p>
           )}
           {limited.phase === 'error' && (
-            <p className="text-sm text-amber-600 dark:text-amber-400" data-testid="rate-limit-error">
+            <p className="result error text-sm text-amber-600 dark:text-amber-400">
               {limited.message}
             </p>
           )}
           <button
             type="button"
             className="btn-secondary"
-            data-testid="rate-limit-retry"
             disabled={limited.phase === 'loading'}
             onClick={loadLimited}
           >
@@ -116,19 +114,18 @@ export function FlakyNetworkChallenge() {
           <h2 className="text-sm font-medium">Slow endpoint (client timeout)</h2>
           <p className="text-xs text-slate-400">Server takes 6s; the client aborts at 3s.</p>
           {timeoutState.phase === 'error' && (
-            <p className="text-sm text-rose-600 dark:text-rose-400" data-testid="timeout-error">
+            <p className="result error text-sm text-rose-600 dark:text-rose-400">
               {timeoutState.message}
             </p>
           )}
           {timeoutState.phase === 'ok' && (
-            <p className="text-emerald-600 dark:text-emerald-400" data-testid="timeout-ok">
+            <p className="result text-emerald-600 dark:text-emerald-400">
               Completed (no timeout)
             </p>
           )}
           <button
             type="button"
             className="btn-secondary"
-            data-testid="timeout-trigger"
             disabled={timeoutState.phase === 'loading'}
             onClick={loadTimeout}
           >
@@ -142,14 +139,13 @@ export function FlakyNetworkChallenge() {
           <button
             type="button"
             className="btn-secondary"
-            data-testid="reroll-intermittent"
             onClick={() => setIntermittent(Math.random() < 0.5)}
           >
-            Re-roll
+            Reroll
           </button>
           {intermittent && (
-            <p className="text-sm text-brand-600 dark:text-brand-400" data-testid="intermittent-message">
-              You got the lucky render!
+            <p className="result text-sm text-brand-600 dark:text-brand-400">
+              Rendered this time.
             </p>
           )}
         </section>

@@ -36,7 +36,7 @@ export function ChallengeShell({
 
       <header className="space-y-2">
         <div className="flex flex-wrap items-center gap-2">
-          <h1 className="text-xl font-semibold" data-testid="page-title">
+          <h1 className="text-xl font-semibold">
             {title}
           </h1>
           <span className={cn('badge capitalize', TIER_STYLES[tier])}>{tier}</span>
@@ -44,7 +44,7 @@ export function ChallengeShell({
         <p className="text-sm text-slate-500 dark:text-slate-400">{blurb}</p>
       </header>
 
-      <section className="card p-5" data-testid="challenge-goal">
+      <section className="card goal p-5">
         <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Your task</h2>
         <ul className="mt-2 list-disc space-y-1 ps-5 text-sm text-slate-600 dark:text-slate-300">
           {goal.map((g) => (
@@ -58,7 +58,7 @@ export function ChallengeShell({
         )}
       </section>
 
-      <section className="card p-5" data-testid="challenge-stage">
+      <section className="card stage p-5">
         {children}
       </section>
     </div>

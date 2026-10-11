@@ -35,7 +35,7 @@ export function UnstableIdsChallenge() {
     <ChallengeShell
       title="Unstable IDs & attributes"
       tier="hard"
-      blurb="Every id, name and data-testid is regenerated on a timer — and even on each render. Selectors that hard-code an id will break between locating and interacting."
+      blurb="Every id, name and generated attribute changes on a timer — and even on each render. Selectors that hard-code an id will break between locating and interacting."
       goal={[
         'Tick the consent checkbox and click "Deactivate account" — using role/label/text, not ids.',
         'Type a reason into the field and submit; read the confirmation.',
@@ -43,7 +43,7 @@ export function UnstableIdsChallenge() {
       ]}
       selector='getByRole("button", { name: "Deactivate account" })'
     >
-      <div className="space-y-5" data-testid="unstable-stage">
+      <div className="stage space-y-5">
         <div className="flex flex-wrap items-center gap-3 text-sm">
           <span className="badge bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
             render #{renderCount}
@@ -56,7 +56,6 @@ export function UnstableIdsChallenge() {
               type="checkbox"
               checked={frozen}
               onChange={(e) => setFrozen(e.target.checked)}
-              data-testid={frozen ? 'freeze-ids' : `freeze-ids-${nonce}`}
             />
             Freeze IDs
           </label>
@@ -98,7 +97,6 @@ export function UnstableIdsChallenge() {
           <button
             type="submit"
             id={`deactivate-${token}-${nonce}`}
-            data-testid={`deactivate-${token}-${nonce}`}
             className="btn-danger"
           >
             Deactivate account
@@ -106,18 +104,17 @@ export function UnstableIdsChallenge() {
         </form>
 
         {submitted && (
-          <p className="text-sm text-emerald-600 dark:text-emerald-400" data-testid="unstable-result">
+          <p className="result text-sm text-emerald-600 dark:text-emerald-400">
             Deactivation submitted: “{submitted}”
           </p>
         )}
 
-        <ul className="divide-y divide-slate-100 rounded-lg border border-slate-200 dark:divide-slate-800 dark:border-slate-700" data-testid="unstable-list">
+        <ul className="list divide-y divide-slate-100 rounded-lg border border-slate-200 dark:divide-slate-800 dark:border-slate-700">
           {BASE_ITEMS.map((item, i) => (
             <li
               key={frozen ? item.id : `${token}-${nonce}-${item.id}`}
               id={frozen ? `row-${item.id}` : `row-${token}-${nonce}-${item.id}`}
-              className="flex items-center justify-between px-3 py-2 text-sm"
-              data-testid={`invoice-row-${item.id}`}
+              className="row flex items-center justify-between px-3 py-2 text-sm"
             >
               <span>{item.label}</span>
               <span className="text-slate-400">{frozen ? 'stable key' : `key ${token}-${i}`}</span>

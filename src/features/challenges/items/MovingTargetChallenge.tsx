@@ -35,10 +35,9 @@ export function MovingTargetChallenge() {
       selector='getByRole("button", { name: "Confirm" })'
     >
       <div className="space-y-5">
-        <div className="relative h-44 overflow-hidden rounded-lg border border-dashed border-slate-300 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/40" data-testid="moving-stage">
+        <div className="stage relative h-44 overflow-hidden rounded-lg border border-dashed border-slate-300 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/40">
           <button
             type="button"
-            data-testid="moving-confirm"
             onClick={() => setCaught((c) => c + 1)}
             className="btn-primary absolute transition-all duration-500 ease-out"
             style={{ left: `${pos.left}%`, top: `${pos.top}%` }}
@@ -51,7 +50,6 @@ export function MovingTargetChallenge() {
         <div className="flex items-center gap-4">
           <button
             type="button"
-            data-testid="shy-button"
             onMouseEnter={() => setShy({ x: (Math.random() - 0.5) * 220, y: (Math.random() - 0.5) * 80, n: 0 })}
             onClick={() => setShy((s) => ({ ...s, n: s.n + 1 }))}
             className="btn-secondary"
@@ -64,24 +62,20 @@ export function MovingTargetChallenge() {
           </span>
         </div>
 
-        <div className="space-y-3" data-testid="layout-shift-stage">
+        <div className="checkout space-y-3">
           {adVisible && !dismissed && (
-            <div
-              className="flex items-center justify-between gap-3 rounded-lg bg-amber-100 px-4 py-3 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-200"
-              data-testid="promo-banner"
-            >
+            <div className="promo flex items-center justify-between gap-3 rounded-lg bg-amber-100 px-4 py-3 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-200">
               <span>Limited offer! Don’t miss out.</span>
               <button
                 type="button"
                 className="rounded-md bg-amber-900 px-2 py-1 text-xs font-medium text-white dark:bg-amber-200 dark:text-amber-950"
                 onClick={() => setDismissed(true)}
-                data-testid="dismiss-promo"
               >
                 Dismiss
               </button>
             </div>
           )}
-          <button type="button" className="btn-primary" data-testid="proceed-checkout">
+          <button type="button" className="btn-primary">
             Proceed to checkout
           </button>
           <p className="text-xs text-slate-400">

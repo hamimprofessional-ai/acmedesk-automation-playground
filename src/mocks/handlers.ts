@@ -1,11 +1,37 @@
 import { http, HttpResponse, delay } from 'msw';
-import { db, type Product, type Ticket } from './data';
+import {
+  db,
+  CARRIERS,
+  ORDER_STATUSES,
+  RETURN_STATUSES,
+  type Order,
+  type OrderChannel,
+  type OrderLine,
+  type Product,
+  type ReturnRequest,
+  type ReturnStatus,
+  type ShipmentEvent,
+  type ShipmentStage,
+  type Ticket,
+} from './data';
 import { mockConfig } from './config';
 import { createPdf } from './pdf';
 
 const ok = <T>(data: T) => HttpResponse.json(data as object);
 const fail = (status: number, message: string) =>
   HttpResponse.json({ message }, { status });
+
+const round2 = (n: number) => Math.round(n * 100) / 100;
+
+const SHIPMENT_PROGRESSION: ShipmentStage[] = [
+  'label_created',
+  'picked_up',
+  'in_transit',
+  'out_for_delivery',
+  'delivered',
+];
+
+const fakerCarrier = () => CARRIERS[Math.floor(Math.random() * CARRIERS.length)];
 
 // Rolling counter for the Challenge Lab rate-limit endpoint.
 let rateLimitHits = 0;
@@ -80,6 +106,36 @@ function filterTickets(url: URL): Ticket[] {
     return 0;
   });
   return items;
+}
+
+function filterOrders(url: URL): Order[] {
+  const q = (url.searchParams.get('q') ?? '').trim().toLowerCase();
+  const statuses = url.searchParams.getAll('status');
+  const payment = url.searchParams.get('payment');
+  const channel = url.searchParams.get('channel');
+  const customerId = url.searchParams.get('customerId');
+
+  const items = db.orders.filter((o) => {
+    if (statuses.length && !statuses.includes(o.status)) return false;
+    if (payment && o.paymentStatus !== payment) return false;
+    if (channel && o.channel !== channel) return false;
+    if (customerId && o.customerId !== customerId) return false;
+    if (q && !`${o.ref} ${o.customerName} ${o.trackingNumber ?? ''}`.toLowerCase().includes(q)) {
+      return false;
+    }
+    return true;
+  });
+
+  const sort = url.searchParams.get('sort') ?? 'createdAt';
+  const dir = url.searchParams.get('dir') === 'asc' ? 1 : -1;
+  return [...items].sort((a, b) => {
+    const av = (a as unknown as Record<string, unknown>)[sort];
+    const bv = (b as unknown as Record<string, unknown>)[sort];
+    if (av == null || bv == null) return 0;
+    if (av < bv) return -1 * dir;
+    if (av > bv) return 1 * dir;
+    return 0;
+  });
 }
 
 export const handlers = [
@@ -282,6 +338,288 @@ export const handlers = [
     const suffix = lowStock ? 'low-stock' : 'all';
     const stamp = new Date().toISOString().slice(0, 10);
     return csvResponse(`inventory-${suffix}-${stamp}.csv`, csv);
+  }),
+
+  // ----- Orders & fulfillment ----------------------------------------------
+  http.get('/api/orders', async ({ request }) => {
+    if (await sim()) return fail(500, 'Failed to load orders');
+    const url = new URL(request.url);
+    const page = Number(url.searchParams.get('page') ?? 1);
+    const pageSize = Number(url.searchParams.get('pageSize') ?? mockConfig.pageSize);
+    const items = filterOrders(url);
+    return ok({
+      ...paginate(items, page, pageSize),
+      counts: ORDER_STATUSES.reduce<Record<string, number>>((acc, s) => {
+        acc[s] = db.orders.filter((o) => o.status === s).length;
+        return acc;
+      }, {}),
+    });
+  }),
+
+  http.get('/api/orders/export.csv', async ({ request }) => {
+    if (await sim(500)) return fail(500, 'Export failed');
+    const url = new URL(request.url);
+    const items = filterOrders(url);
+    const csv = toCsv(
+      ['Ref', 'Customer', 'Items', 'Currency', 'Subtotal', 'Shipping', 'Tax', 'Total', 'Payment', 'Status', 'Channel', 'Created'],
+      items.map((o) => [
+        o.ref,
+        o.customerName,
+        String(o.items.length),
+        o.currency,
+        o.subtotal.toFixed(2),
+        o.shipping.toFixed(2),
+        o.tax.toFixed(2),
+        o.total.toFixed(2),
+        o.paymentStatus,
+        o.status,
+        o.channel,
+        o.createdAt.slice(0, 10),
+      ]),
+    );
+    const stamp = new Date().toISOString().slice(0, 10);
+    return csvResponse(`orders-${stamp}.csv`, csv);
+  }),
+
+  http.get('/api/orders/:id', async ({ params }) => {
+    if (await sim()) return fail(500, 'Order not found');
+    const order = db.orders.find((x) => x.id === params.id || x.ref === params.id);
+    if (!order) return fail(404, 'Order not found');
+    return ok({
+      order,
+      shipments: db.shipments
+        .filter((s) => s.orderId === order.id)
+        .sort((a, b) => a.at.localeCompare(b.at)),
+      returns: db.returns.filter((r) => r.orderId === order.id),
+    });
+  }),
+
+  http.post('/api/orders', async ({ request }) => {
+    if (await sim()) return fail(500, 'Could not create order');
+    const body = (await request.json()) as Partial<Order> & { items?: OrderLine[] };
+    if (!body.customerId) return fail(422, 'Select a customer');
+    if (!body.items || body.items.length === 0) return fail(422, 'Add at least one line item');
+    const customer = db.customers.find((c) => c.id === body.customerId) ?? db.customers[0];
+    const items: OrderLine[] = body.items.map((it) => ({
+      productId: it.productId,
+      sku: it.sku,
+      name: it.name,
+      quantity: Math.max(1, Number(it.quantity) || 1),
+      unitPrice: Number(it.unitPrice) || 0,
+    }));
+    const subtotal = round2(items.reduce((s, it) => s + it.quantity * it.unitPrice, 0));
+    const shipping = subtotal > 150 ? 0 : 9.95;
+    const tax = round2(subtotal * 0.21);
+    const now = new Date().toISOString();
+    const order: Order = {
+      id: crypto.randomUUID(),
+      ref: `ORD-${Math.floor(10000 + Math.random() * 89999)}`,
+      customerId: customer.id,
+      customerName: customer.name,
+      status: 'pending',
+      paymentStatus: 'pending',
+      channel: (body.channel as OrderChannel) ?? 'web',
+      items,
+      subtotal,
+      shipping,
+      tax,
+      total: round2(subtotal + shipping + tax),
+      currency: 'EUR',
+      shippingAddress: body.shippingAddress ?? '',
+      notes: body.notes ?? '',
+      createdAt: now,
+      updatedAt: now,
+    };
+    db.orders.unshift(order);
+    return ok(order);
+  }),
+
+  http.patch('/api/orders/:id', async ({ params, request }) => {
+    if (await sim()) return fail(500, 'Could not update order');
+    const idx = db.orders.findIndex((x) => x.id === params.id);
+    if (idx === -1) return fail(404, 'Order not found');
+    const body = (await request.json()) as Partial<Order>;
+    db.orders[idx] = { ...db.orders[idx], ...body, updatedAt: new Date().toISOString() };
+    return ok(db.orders[idx]);
+  }),
+
+  http.post('/api/orders/:id/ship', async ({ params, request }) => {
+    if (await sim()) return fail(500, 'Could not create shipment');
+    const idx = db.orders.findIndex((x) => x.id === params.id);
+    if (idx === -1) return fail(404, 'Order not found');
+    const body = (await request.json()) as { carrier?: string; trackingNumber?: string };
+    const carrier = body.carrier || fakerCarrier();
+    const trackingNumber =
+      body.trackingNumber || Math.random().toString(36).slice(2, 13).toUpperCase();
+    const now = new Date().toISOString();
+    const order = db.orders[idx];
+    db.orders[idx] = {
+      ...order,
+      status: 'shipped',
+      paymentStatus: order.paymentStatus === 'pending' ? 'paid' : order.paymentStatus,
+      carrier,
+      trackingNumber,
+      updatedAt: now,
+    };
+    const event: ShipmentEvent = {
+      id: crypto.randomUUID(),
+      orderId: order.id,
+      orderRef: order.ref,
+      stage: 'label_created',
+      carrier,
+      trackingNumber,
+      location: 'Fulfillment center',
+      note: 'Shipping label created',
+      at: now,
+    };
+    db.shipments.push(event);
+    return ok({ order: db.orders[idx], event });
+  }),
+
+  http.post('/api/orders/:id/advance', async ({ params }) => {
+    if (await sim()) return fail(500, 'Could not advance shipment');
+    const order = db.orders.find((x) => x.id === params.id);
+    if (!order) return fail(404, 'Order not found');
+    const events = db.shipments.filter((s) => s.orderId === order.id);
+    const current = events.length ? events[events.length - 1].stage : 'label_created';
+    const next =
+      SHIPMENT_PROGRESSION[Math.min(SHIPMENT_PROGRESSION.indexOf(current) + 1, SHIPMENT_PROGRESSION.length - 1)];
+    const now = new Date().toISOString();
+    const event: ShipmentEvent = {
+      id: crypto.randomUUID(),
+      orderId: order.id,
+      orderRef: order.ref,
+      stage: next,
+      carrier: order.carrier ?? fakerCarrier(),
+      trackingNumber: order.trackingNumber ?? Math.random().toString(36).slice(2, 13).toUpperCase(),
+      location: 'Sorting facility',
+      note: `Shipment ${next.replace(/_/g, ' ')}`,
+      at: now,
+    };
+    db.shipments.push(event);
+    if (next === 'delivered') {
+      const idx = db.orders.findIndex((x) => x.id === order.id);
+      db.orders[idx] = { ...order, status: 'delivered', updatedAt: now };
+    }
+    return ok(event);
+  }),
+
+  http.post('/api/orders/:id/refund', async ({ params }) => {
+    if (await sim()) return fail(500, 'Could not refund order');
+    const idx = db.orders.findIndex((x) => x.id === params.id);
+    if (idx === -1) return fail(404, 'Order not found');
+    db.orders[idx] = {
+      ...db.orders[idx],
+      status: 'refunded',
+      paymentStatus: 'refunded',
+      updatedAt: new Date().toISOString(),
+    };
+    return ok(db.orders[idx]);
+  }),
+
+  http.post('/api/orders/:id/cancel', async ({ params }) => {
+    if (await sim()) return fail(500, 'Could not cancel order');
+    const idx = db.orders.findIndex((x) => x.id === params.id);
+    if (idx === -1) return fail(404, 'Order not found');
+    db.orders[idx] = { ...db.orders[idx], status: 'cancelled', updatedAt: new Date().toISOString() };
+    return ok(db.orders[idx]);
+  }),
+
+  // ----- Shipments (fulfillment queue) --------------------------------------
+  http.get('/api/shipments', async ({ request }) => {
+    if (await sim()) return fail(500, 'Failed to load shipments');
+    const url = new URL(request.url);
+    const status = url.searchParams.get('status');
+    const carrier = url.searchParams.get('carrier');
+    const q = (url.searchParams.get('q') ?? '').toLowerCase();
+    const page = Number(url.searchParams.get('page') ?? 1);
+    const pageSize = Number(url.searchParams.get('pageSize') ?? mockConfig.pageSize);
+    const queue = db.orders
+      .filter((o) => ['processing', 'shipped', 'delivered'].includes(o.status))
+      .map((o) => {
+        const events = db.shipments
+          .filter((s) => s.orderId === o.id)
+          .sort((a, b) => a.at.localeCompare(b.at));
+        const latest = events[events.length - 1];
+        return {
+          orderId: o.id,
+          ref: o.ref,
+          customerName: o.customerName,
+          status: o.status,
+          carrier: o.carrier ?? '—',
+          trackingNumber: o.trackingNumber ?? '—',
+          stage: latest?.stage ?? 'not_shipped',
+          location: latest?.location ?? '—',
+          items: o.items.reduce((s, it) => s + it.quantity, 0),
+          updatedAt: o.updatedAt,
+        };
+      })
+      .filter((row) => {
+        if (status && row.status !== status) return false;
+        if (carrier && row.carrier !== carrier) return false;
+        if (q && !`${row.ref} ${row.customerName} ${row.trackingNumber}`.toLowerCase().includes(q)) {
+          return false;
+        }
+        return true;
+      });
+    return ok({ ...paginate(queue, page, pageSize), carriers: CARRIERS });
+  }),
+
+  // ----- Returns / RMA ------------------------------------------------------
+  http.get('/api/returns', async ({ request }) => {
+    if (await sim()) return fail(500, 'Failed to load returns');
+    const url = new URL(request.url);
+    const status = url.searchParams.get('status');
+    const q = (url.searchParams.get('q') ?? '').toLowerCase();
+    const page = Number(url.searchParams.get('page') ?? 1);
+    const pageSize = Number(url.searchParams.get('pageSize') ?? mockConfig.pageSize);
+    const items = db.returns
+      .filter((r) => {
+        if (status && r.status !== status) return false;
+        if (q && !`${r.ref} ${r.orderRef} ${r.customerName} ${r.reason}`.toLowerCase().includes(q)) {
+          return false;
+        }
+        return true;
+      })
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    return ok({
+      ...paginate(items, page, pageSize),
+      counts: RETURN_STATUSES.reduce<Record<string, number>>((acc, s) => {
+        acc[s] = db.returns.filter((r) => r.status === s).length;
+        return acc;
+      }, {}),
+    });
+  }),
+
+  http.post('/api/returns', async ({ request }) => {
+    if (await sim()) return fail(500, 'Could not create return');
+    const body = (await request.json()) as { orderId?: string; reason?: string };
+    const order = db.orders.find((x) => x.id === body.orderId || x.ref === body.orderId);
+    if (!order) return fail(404, 'Order not found');
+    const now = new Date().toISOString();
+    const ret: ReturnRequest = {
+      id: crypto.randomUUID(),
+      ref: `RMA-${Math.floor(1000 + Math.random() * 8999)}`,
+      orderId: order.id,
+      orderRef: order.ref,
+      customerName: order.customerName,
+      reason: body.reason || 'No longer needed',
+      status: 'requested',
+      amount: order.total,
+      createdAt: now,
+      updatedAt: now,
+    };
+    db.returns.unshift(ret);
+    return ok(ret);
+  }),
+
+  http.patch('/api/returns/:id', async ({ params, request }) => {
+    if (await sim()) return fail(500, 'Could not update return');
+    const idx = db.returns.findIndex((x) => x.id === params.id);
+    if (idx === -1) return fail(404, 'Return not found');
+    const body = (await request.json()) as { status?: ReturnStatus };
+    db.returns[idx] = { ...db.returns[idx], ...body, updatedAt: new Date().toISOString() };
+    return ok(db.returns[idx]);
   }),
 
   // ----- Reports ------------------------------------------------------------

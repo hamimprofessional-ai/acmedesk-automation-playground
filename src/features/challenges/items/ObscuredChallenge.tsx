@@ -31,7 +31,6 @@ export function ObscuredChallenge() {
             <button
               type="button"
               className="btn-primary mt-2"
-              data-testid="save-preferences"
               onClick={() => setSaved(true)}
             >
               Save preferences
@@ -39,16 +38,12 @@ export function ObscuredChallenge() {
           </fieldset>
 
           {adOpen && (
-            <div
-              className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-slate-900/80 p-6 text-center backdrop-blur-sm"
-              data-testid="ad-overlay"
-            >
+            <div className="overlay absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-slate-900/80 p-6 text-center backdrop-blur-sm">
               <p className="text-sm font-semibold text-white">Upgrade to AcmeDesk Pro</p>
               <p className="text-xs text-slate-300">Unlock unlimited automations and priority support.</p>
               <button
                 type="button"
                 className="btn-secondary"
-                data-testid="close-ad"
                 onClick={() => setAdOpen(false)}
               >
                 No thanks, continue
@@ -58,7 +53,7 @@ export function ObscuredChallenge() {
         </div>
 
         {saved && (
-          <p className="text-sm text-emerald-600 dark:text-emerald-400" data-testid="prefs-saved">
+          <p className="result text-sm text-emerald-600 dark:text-emerald-400">
             Preferences saved.
           </p>
         )}
@@ -66,17 +61,14 @@ export function ObscuredChallenge() {
         <div className="h-24" />
 
         {footerOpen && (
-          <div
-            className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-4 py-3 backdrop-blur dark:border-slate-700 dark:bg-slate-900/95"
-            data-testid="sticky-cookie-bar"
-          >
+          <div className="bar fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-4 py-3 backdrop-blur dark:border-slate-700 dark:bg-slate-900/95">
             <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3 text-sm">
               <span>We use cookies to improve your experience. (Sticky bar covering the page bottom.)</span>
               <span className="flex gap-2">
-                <button type="button" className="btn-ghost" data-testid="cookie-decline" onClick={() => setFooterOpen(false)}>
+                <button type="button" className="btn-ghost" onClick={() => setFooterOpen(false)}>
                   Decline
                 </button>
-                <button type="button" className="btn-primary" data-testid="cookie-accept" onClick={() => setFooterOpen(false)}>
+                <button type="button" className="btn-primary" onClick={() => setFooterOpen(false)}>
                   Accept cookies
                 </button>
               </span>

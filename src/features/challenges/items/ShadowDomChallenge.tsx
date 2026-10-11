@@ -20,7 +20,7 @@ class OpenShadowCard extends HTMLElement {
         <label for="cardholder">Cardholder name</label>
         <input id="cardholder" part="input" aria-label="Cardholder name" />
         <button part="button" type="button">Save card</button>
-        <span class="status" data-testid="shadow-open-status" role="status"></span>
+        <span class="status" role="status"></span>
       </div>`;
     const input = root.querySelector('input') as HTMLInputElement;
     const status = root.querySelector('.status') as HTMLElement;
@@ -80,13 +80,13 @@ export function ShadowDomChallenge() {
         'Click "Reveal code" in the closed shadow card and capture the generated code.',
         'Prove your selectors reach into the open shadow root but not the closed one.',
       ]}
-      selector='acmedesk-shadow-open >> [aria-label="Cardholder name"]'
+      selector='acmedesk-shadow-open input'
     >
-      <div className="space-y-4" data-testid="shadow-stage">
+      <div className="space-y-4 practice-stack">
         {/* @ts-expect-error custom element */}
-        <acmedesk-shadow-open data-testid="shadow-open" />
+        <acmedesk-shadow-open className="shadow-card" />
         {/* @ts-expect-error custom element */}
-        <acmedesk-shadow-closed data-testid="shadow-closed" />
+        <acmedesk-shadow-closed className="shadow-card" />
         <p className="text-xs text-slate-400">
           Tip: Playwright pierces <em>open</em> shadow roots automatically. A closed root is unreachable from JS —
           you must interact positionally or via the host's accessible tree.

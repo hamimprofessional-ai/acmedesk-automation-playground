@@ -36,29 +36,27 @@ export function LogicGateChallenge() {
       selector='text-based assertions instead of fixed ids'
     >
       <div className="grid gap-5 sm:grid-cols-2">
-        <section className="space-y-2 rounded-lg border border-slate-200 p-4 dark:border-slate-700" data-testid="gate-math">
+        <section className="gate space-y-2 rounded-lg border border-slate-200 p-4 dark:border-slate-700">
           <h2 className="text-sm font-medium">1 · Compute</h2>
           <p className="text-sm">
-            What is <strong data-testid="math-a">{a}</strong> × <strong data-testid="gate-b">{b}</strong>?
+            What is <strong className="num">{a}</strong> × <strong className="num">{b}</strong>?
           </p>
           <input
             className="input"
             inputMode="numeric"
-            data-testid="gate-answer"
             value={answer}
             onChange={(e) => setAnswer(e.target.value)}
           />
           <button
             type="button"
             className="btn-secondary"
-            data-testid="gate-math-submit"
             onClick={() => record(Number(answer) === a * b ? 'math ✓ correct' : `math ✗ (expected ${a * b})`)}
           >
             Submit answer
           </button>
         </section>
 
-        <section className="space-y-2 rounded-lg border border-slate-200 p-4 dark:border-slate-700" data-testid="gate-index">
+        <section className="gate space-y-2 rounded-lg border border-slate-200 p-4 dark:border-slate-700">
           <h2 className="text-sm font-medium">2 · Pick the third node</h2>
           <div className="flex flex-wrap gap-2">
             {items.map((label, i) => (
@@ -78,7 +76,7 @@ export function LogicGateChallenge() {
           <p className="text-xs text-slate-400">Current pick: {picked === null ? 'none' : items[picked]}</p>
         </section>
 
-        <section className="space-y-2 rounded-lg border border-slate-200 p-4 dark:border-slate-700" data-testid="gate-slider">
+        <section className="gate space-y-2 rounded-lg border border-slate-200 p-4 dark:border-slate-700">
           <h2 className="text-sm font-medium">2 · Reach the target</h2>
           <p className="text-sm">Target: {target}</p>
           <input
@@ -86,7 +84,6 @@ export function LogicGateChallenge() {
             min={0}
             max={100}
             value={slider}
-            data-testid="gate-range"
             onChange={(e) => setSlider(Number(e.target.value))}
             className="w-full"
             aria-label="Target slider"
@@ -96,7 +93,6 @@ export function LogicGateChallenge() {
             <button
               type="button"
               className="btn-secondary"
-              data-testid="gate-slider-confirm"
               onClick={() => record(Math.abs(slider - target) <= 1 ? 'slider ✓' : `slider ✗ (${slider})`)}
             >
               Confirm
@@ -104,15 +100,14 @@ export function LogicGateChallenge() {
           </div>
         </section>
 
-        <section className="space-y-2 rounded-lg border border-slate-200 p-4 dark:border-slate-700" data-testid="gate-word">
+        <section className="gate space-y-2 rounded-lg border border-slate-200 p-4 dark:border-slate-700">
           <h2 className="text-sm font-medium">4 · Type the word</h2>
-          <p className="font-mono text-lg tracking-widest text-slate-700 dark:text-slate-200" data-testid="gate-word-value">
+          <p className="word font-mono text-lg tracking-widest text-slate-700 dark:text-slate-200">
             {word}
           </p>
           <input
             className="input"
             value={typed}
-            data-testid="gate-word-input"
             onChange={(e) => setTyped(e.target.value)}
             placeholder="Type it exactly"
             aria-label="Verification word"
@@ -120,14 +115,13 @@ export function LogicGateChallenge() {
           <button
             type="button"
             className="btn-secondary"
-            data-testid="gate-word-submit"
             onClick={() => record(typed === word ? 'word ✓' : 'word ✗')}
           >
             Submit word
           </button>
         </section>
 
-        <section className="rounded-lg bg-slate-50 p-3 text-sm sm:col-span-2 dark:bg-slate-800/50" data-testid="gate-log">
+        <section className="result log rounded-lg bg-slate-50 p-3 text-sm sm:col-span-2 dark:bg-slate-800/50">
           {results.length === 0 ? (
             <span className="text-slate-400">Results appear here as you solve each gate…</span>
           ) : (

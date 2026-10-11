@@ -36,6 +36,8 @@ have to *discover* triggers the way you would on a real site.
 - **Tickets** — list → detail, filters, bulk actions, a kanban board, and a create wizard
 - **Customers** — list → profile, documents, contacts
 - **Inventory** — product/stock table with export and low-stock reports
+- **Orders & fulfillment** — orders, a create flow with computed totals, shipment tracking,
+  and an RMA/returns workflow
 - **Reports** — generate and download CSV/PDF reports
 - **Settings** — appearance, locale, navigation, integrations, and backend simulation
 - **Capabilities** — a self-documenting catalog of every testable behavior in the app
@@ -116,6 +118,11 @@ same information is broken into **guided practice tasks** in
 | `/tickets/:id` | Ticket detail | Comments, attachments, print view, real cross-origin embed |
 | `/customers` | Customers | List → profile, documents |
 | `/inventory` | Inventory | Stock table, low-stock report, CSV export |
+| `/orders` | Orders | Filterable list with status counts, filtered CSV export |
+| `/orders/new` | New order | Line items, live totals (VAT + shipping), validation |
+| `/orders/:id` | Order detail | Items, tracking timeline, ship/advance/refund/cancel, request return |
+| `/shipments` | Shipments | Fulfillment queue, carrier filter, per-row advance |
+| `/returns` | Returns | RMA workflow: approve/reject/receive/refund |
 | `/reports` | Reports | Generate + download PDF/CSV reports |
 | `/settings` | Settings | Appearance, locale, navigation, consent, integrations, backend simulation |
 | `/capabilities` | Capabilities | Searchable catalog of all testable behaviors |
@@ -205,7 +212,7 @@ practice-demo-site/
 │  └─ _redirects             # SPA fallback for static hosting
 ├─ src/
 │  ├─ app/                   # App shell, router, layout, providers
-│  ├─ pages/                 # Dashboard, Tickets, Customers, Inventory, Reports, Settings, Capabilities…
+│  ├─ pages/                 # Dashboard, Tickets, Customers, Inventory, Orders, Shipments, Returns, Reports, Settings…
 │  ├─ components/            # Modal, DropdownMenu, Accordion, Carousel, Tooltip, RichTextEditor, VirtualList…
 │  ├─ features/              # capability modules (files, tickets, web components)
 │  ├─ mocks/                 # MSW handlers, seed data, config, PDF generation

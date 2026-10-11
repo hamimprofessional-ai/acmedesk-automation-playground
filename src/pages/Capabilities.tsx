@@ -460,7 +460,7 @@ const GROUPS: CapabilityGroup[] = [
         page: 'Challenge Lab',
         to: '/challenges/shadow-dom',
         trigger: 'Fill the shadow card, click Save; reveal the closed-shadow code',
-        selector: 'data-testid="acmedesk-shadow-open" → [aria-label="Cardholder name"]',
+        selector: 'acmedesk-shadow-open input',
         tier: 'hard',
       },
       {
@@ -468,7 +468,7 @@ const GROUPS: CapabilityGroup[] = [
         page: 'Challenge Lab',
         to: '/challenges/nested-iframes',
         trigger: 'Switch into the nested frame; spawn, resize and reveal frames',
-        selector: 'data-testid="challenge-nested-iframe"',
+        selector: 'iframe.frame',
         tier: 'hard',
       },
       {
@@ -476,7 +476,7 @@ const GROUPS: CapabilityGroup[] = [
         page: 'Challenge Lab',
         to: '/challenges/unstable-ids',
         trigger: 'Submit the form while ids churn every 2s; toggle Freeze IDs',
-        selector: 'data-testid="unstable-list"',
+        selector: 'getByRole("button", { name: "Deactivate account" })',
         tier: 'hard',
       },
       {
@@ -484,7 +484,7 @@ const GROUPS: CapabilityGroup[] = [
         page: 'Challenge Lab',
         to: '/challenges/moving-targets',
         trigger: 'Click the floating Confirm button; dodge button; dismiss the late banner',
-        selector: 'data-testid="moving-confirm"',
+        selector: 'getByRole("button", { name: "Confirm" })',
         tier: 'hard',
       },
       {
@@ -492,7 +492,7 @@ const GROUPS: CapabilityGroup[] = [
         page: 'Challenge Lab',
         to: '/challenges/hover-only',
         trigger: 'Hover a row to reveal Archive/Attach; hover for the tier text',
-        selector: 'data-testid="hover-list"',
+        selector: 'li.item:has-text("INV-2201") >> text=Archive',
         tier: 'medium',
       },
       {
@@ -500,7 +500,7 @@ const GROUPS: CapabilityGroup[] = [
         page: 'Challenge Lab',
         to: '/challenges/obscured',
         trigger: 'Close the ad overlay, then save; accept the sticky cookie bar',
-        selector: 'data-testid="ad-overlay" / "save-preferences"',
+        selector: 'getByRole("button", { name: "Save preferences" })',
         tier: 'medium',
       },
       {
@@ -508,7 +508,7 @@ const GROUPS: CapabilityGroup[] = [
         page: 'Challenge Lab',
         to: '/challenges/detached',
         trigger: 'Pause the refresh, then click a row; save a note before it clears',
-        selector: 'data-testid="toggle-refresh"',
+        selector: 'li.row:has-text("UMBR")',
         tier: 'hard',
       },
       {
@@ -516,7 +516,7 @@ const GROUPS: CapabilityGroup[] = [
         page: 'Challenge Lab',
         to: '/challenges/delayed-async',
         trigger: 'Wait out the skeleton; capture the late secret token',
-        selector: 'data-testid="delayed-secret"',
+        selector: 'table tr.row',
         tier: 'medium',
       },
       {
@@ -524,7 +524,7 @@ const GROUPS: CapabilityGroup[] = [
         page: 'Challenge Lab',
         to: '/challenges/flaky-network',
         trigger: 'Retry the 500 / 429 endpoints; trigger the client timeout',
-        selector: 'data-testid="flaky-retry" / "rate-limit-retry"',
+        selector: 'button:has-text("Load balance")',
         tier: 'hard',
       },
       {
@@ -532,7 +532,7 @@ const GROUPS: CapabilityGroup[] = [
         page: 'Challenge Lab',
         to: '/challenges/native-prompts',
         trigger: 'Trigger each native dialog; toggle beforeunload guard',
-        selector: 'data-testid="trigger-confirm"',
+        selector: 'page.on("dialog", d => d.accept("Ada"))',
         tier: 'medium',
       },
       {
@@ -540,7 +540,7 @@ const GROUPS: CapabilityGroup[] = [
         page: 'Challenge Lab',
         to: '/challenges/logic-gate',
         trigger: 'Solve the product, pick the 3rd node, hit the slider target, echo the word',
-        selector: 'data-testid="gate-math"',
+        selector: 'text-based assertions instead of fixed ids',
         tier: 'hard',
       },
       {
@@ -548,8 +548,68 @@ const GROUPS: CapabilityGroup[] = [
         page: 'Challenge Lab',
         to: '/challenges/drag-and-drop',
         trigger: 'Reorder the checklist; drag a card into the Done bucket',
-        selector: 'data-testid="sortable-list"',
+        selector: 'locator.dragTo() or a dispatchEvent drag sequence',
         tier: 'hard',
+      },
+    ],
+  },
+  {
+    title: 'Orders & fulfillment',
+    note: 'End-to-end commerce flow: orders, shipment tracking and returns.',
+    items: [
+      {
+        name: 'Filterable order list with status counts',
+        page: 'Orders',
+        to: '/orders',
+        trigger: 'Filter by status / payment / channel, search ref or customer',
+        tier: 'medium',
+      },
+      {
+        name: 'Filtered CSV export',
+        page: 'Orders',
+        to: '/orders',
+        trigger: '"Export CSV" button — honours the active filters',
+        selector: 'data-testid="export-orders"',
+        tier: 'medium',
+      },
+      {
+        name: 'Create order with computed totals',
+        page: 'New order',
+        to: '/orders/new',
+        trigger: 'Pick a customer, add line items; subtotal/shipping/tax/total update live',
+        selector: 'data-testid="create-order"',
+        tier: 'medium',
+      },
+      {
+        name: 'Order detail state machine',
+        page: 'Order detail',
+        to: '/orders',
+        trigger: 'Create shipment → Advance → Refund / Cancel; tracking timeline grows',
+        tier: 'hard',
+      },
+      {
+        name: 'Request return (modal)',
+        page: 'Order detail',
+        to: '/orders',
+        trigger: 'Delivered order → "Request return" → pick a reason',
+        selector: 'data-testid="request-return"',
+        tier: 'easy',
+      },
+      {
+        name: 'Fulfillment queue with per-row advance',
+        page: 'Shipments',
+        to: '/shipments',
+        trigger: 'Filter by carrier, then "Advance" a row through the stages',
+        selector: 'data-testid="shipments-table"',
+        tier: 'medium',
+      },
+      {
+        name: 'Returns RMA workflow',
+        page: 'Returns',
+        to: '/returns',
+        trigger: 'Approve / Reject / Receive / Refund a request; status counts update',
+        selector: 'data-testid="returns-table"',
+        tier: 'medium',
       },
     ],
   },
@@ -572,8 +632,7 @@ export function Capabilities() {
         !needle ||
         i.name.toLowerCase().includes(needle) ||
         i.page.toLowerCase().includes(needle) ||
-        i.trigger.toLowerCase().includes(needle) ||
-        (i.selector ?? '').toLowerCase().includes(needle),
+        i.trigger.toLowerCase().includes(needle),
     ),
   })).filter((g) => g.items.length > 0);
 
@@ -597,7 +656,7 @@ export function Capabilities() {
         <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
         <input
           type="search"
-          placeholder="Filter by name, page, trigger or selector…"
+          placeholder="Filter by name, page or trigger…"
           aria-label="Filter capabilities"
           data-testid="capability-search"
           className="input ps-9"
@@ -626,7 +685,6 @@ export function Capabilities() {
                   <th className="px-4 py-2.5">Capability</th>
                   <th className="px-4 py-2.5">Where</th>
                   <th className="px-4 py-2.5">How to trigger</th>
-                  <th className="px-4 py-2.5">Selector</th>
                   <th className="px-4 py-2.5">Tier</th>
                 </tr>
               </thead>
@@ -640,7 +698,6 @@ export function Capabilities() {
                       </Link>
                     </td>
                     <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{item.trigger}</td>
-                    <td className="px-4 py-3 font-mono text-xs text-slate-400">{item.selector ?? '—'}</td>
                     <td className="px-4 py-3">
                       {item.tier && (
                         <span className={`badge capitalize ${TIER_STYLES[item.tier]}`}>{item.tier}</span>

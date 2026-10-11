@@ -8,6 +8,11 @@ import { NewTicketWizard } from '@/pages/NewTicketWizard';
 import { Customers } from '@/pages/Customers';
 import { CustomerDetail } from '@/pages/CustomerDetail';
 import { Inventory } from '@/pages/Inventory';
+import { Orders } from '@/pages/Orders';
+import { NewOrder } from '@/pages/NewOrder';
+import { OrderDetail } from '@/pages/OrderDetail';
+import { Shipments } from '@/pages/Shipments';
+import { Returns } from '@/pages/Returns';
 import { Reports } from '@/pages/Reports';
 import { Settings } from '@/pages/Settings';
 import { Capabilities } from '@/pages/Capabilities';
@@ -45,6 +50,11 @@ export default function App() {
           <Route path="/customers" element={<Customers />} />
           <Route path="/customers/:id" element={<CustomerDetail />} />
           <Route path="/inventory" element={<Inventory />} />
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/orders/new" element={<NewOrder />} />
+          <Route path="/orders/:id" element={<OrderDetail />} />
+          <Route path="/shipments" element={<Shipments />} />
+          <Route path="/returns" element={<Returns />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/capabilities" element={<Capabilities />} />

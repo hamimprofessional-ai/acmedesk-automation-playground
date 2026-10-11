@@ -16,20 +16,19 @@ export function NestedIframesChallenge() {
         'Click "Spawn iframe", wait for the frame to appear, then read the "In transit" value inside it.',
         'Toggle the width, then reveal the hidden iframe and read its transit value.',
       ]}
-      selector='iframe[data-testid="challenge-iframe-nested"]'
+      selector='iframe.frame'
     >
       <div className="space-y-4">
         <div className="flex flex-wrap gap-2">
-          <button type="button" className="btn-secondary" data-testid="iframe-spawn" onClick={() => setSpawned(true)}>
+          <button type="button" className="btn-secondary" onClick={() => setSpawned(true)}>
             Spawn iframe (after 800ms)
           </button>
-          <button type="button" className="btn-secondary" data-testid="iframe-resize" onClick={() => setWide((w) => !w)}>
+          <button type="button" className="btn-secondary" onClick={() => setWide((w) => !w)}>
             {wide ? 'Shrink' : 'Widen'} nested iframe
           </button>
           <button
             type="button"
             className="btn-secondary"
-            data-testid="iframe-toggle-visibility"
             onClick={() => setShown((s) => !s)}
           >
             {shown ? 'Hide' : 'Show'} hidden iframe
@@ -43,9 +42,8 @@ export function NestedIframesChallenge() {
         >
           <iframe
             title="Vendor portal"
-            data-testid="challenge-nested-iframe"
             src="/embed/vendor"
-            className="block h-[280px] w-full border-0 bg-white"
+            className="frame block h-[280px] w-full border-0 bg-white"
           />
         </div>
 
@@ -55,9 +53,8 @@ export function NestedIframesChallenge() {
           <div className="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
             <iframe
               title="Status panel"
-              data-testid="challenge-hidden-iframe"
               src="/embed/vendor/status"
-              className="block h-[240px] w-full border-0 bg-white"
+              className="frame block h-[240px] w-full border-0 bg-white"
             />
           </div>
         )}
@@ -76,20 +73,17 @@ function SpawnedIframe() {
 
   if (!ready) {
     return (
-      <p className="text-sm text-slate-400" data-testid="iframe-spawn-pending">
-        Spawning iframe…
-      </p>
+      <p className="pending text-sm text-slate-400">Spawning iframe…</p>
     );
   }
 
   return (
     <div className="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
-      <iframe
-        title="Spawned status"
-        data-testid="challenge-spawned-iframe"
-        src="/embed/vendor/status"
-        className="block h-[240px] w-full border-0 bg-white"
-      />
+          <iframe
+            title="Status panel"
+            src="/embed/vendor/status"
+            className="frame block h-[240px] w-full border-0 bg-white"
+          />
     </div>
   );
 }

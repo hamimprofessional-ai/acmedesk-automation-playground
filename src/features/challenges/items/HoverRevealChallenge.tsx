@@ -22,15 +22,14 @@ export function HoverRevealChallenge() {
         'Open the "Attach" control, which is only revealed on hover.',
         'Click "Download" even though a tooltip overlaps it.',
       ]}
-      selector='row.hover() → getByRole("button", { name: "Archive" })'
+      selector='li.item:has-text("INV-2201") >> text=Archive'
     >
       <div className="space-y-5">
-        <ul className="space-y-2" data-testid="hover-list">
+        <ul className="list space-y-2">
           {ROWS.map((row) => (
             <li
               key={row.id}
-              className="group flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2 dark:border-slate-700"
-              data-testid={`hover-row-${row.id}`}
+              className="item group flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2 dark:border-slate-700"
             >
               <span className="text-sm">
                 {row.id} · {row.amount}
@@ -39,16 +38,14 @@ export function HoverRevealChallenge() {
               <span className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
                 <button
                   type="button"
-                  className="btn-ghost px-2 py-1 text-xs"
-                  data-testid={`attach-${row.id}`}
+                  className="action btn-ghost px-2 py-1 text-xs"
                   onClick={() => logAction(`attach ${row.id}`)}
                 >
                   Attach
                 </button>
                 <button
                   type="button"
-                  className="btn-ghost px-2 py-1 text-xs"
-                  data-testid={`archive-${row.id}`}
+                  className="action btn-ghost px-2 py-1 text-xs"
                   onClick={() => {
                     setMarked((m) => [...m, row.id]);
                     logAction(`archived ${row.id}`);
@@ -66,7 +63,6 @@ export function HoverRevealChallenge() {
             <button
               type="button"
               className="btn-secondary"
-              data-testid="download-receipt"
               onClick={() => logAction('download started')}
             >
               Download
@@ -77,10 +73,7 @@ export function HoverRevealChallenge() {
           </div>
 
           <div className="group relative">
-            <span
-              className="cursor-help border-b border-dotted border-slate-400 text-sm"
-              data-testid="hover-reveal-text"
-            >
+            <span className="hint cursor-help border-b border-dotted border-slate-400 text-sm">
               Hover for account tier
             </span>
             <span className="pointer-events-none invisible absolute left-0 top-6 z-10 whitespace-nowrap rounded bg-slate-900 px-2 py-1 text-xs text-white group-hover:visible">
@@ -89,7 +82,7 @@ export function HoverRevealChallenge() {
           </div>
         </div>
 
-        <div className="rounded-lg bg-slate-50 p-3 text-xs dark:bg-slate-800/50" data-testid="hover-log">
+        <div className="log rounded-lg bg-slate-50 p-3 text-xs dark:bg-slate-800/50">
           {log.length === 0 ? <span className="text-slate-400">Action log…</span> : log.map((l) => <div key={l}>{l}</div>)}
         </div>
       </div>

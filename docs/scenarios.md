@@ -426,7 +426,7 @@ production pages (which keep stable ids). Hub: `/challenges`.
 
 ### C17-02 — Nested & dynamic iframes
 - **Tier:** hard → `/challenges/nested-iframes`
-- **Task:** Switch into `[challenge-nested-iframe]`, then its child frame (2 levels). Spawn a
+- **Task:** Switch into the nested `iframe.frame`, then its child frame (2 levels). Spawn a
   new frame (appears after ~800 ms), resize the outer frame, and toggle the hidden frame.
 - **Expected:** 2-level frame switching, waiting for a spawned frame, and frame
   context resets between actions.
@@ -490,6 +490,56 @@ production pages (which keep stable ids). Hub: `/challenges`.
 - **Task:** Reorder the checklist so **Review metrics** is first; drag **Ship it** into **Done**.
 - **Expected:** HTML5 drag events (`dragstart`/`dragover`/`drop`) via `dragTo()` or a synthesized
   event sequence.
+
+---
+
+## C18 - Orders & fulfillment
+
+End-to-end commerce flow across four linked pages: `/orders`, `/orders/new`,
+`/orders/:id` (with `/shipments` and `/returns` as work queues). Writes persist in the
+in-memory store for the session.
+
+### C18-01 — Filter the order list
+- **Tier:** medium → `/orders`
+- **Task:** Search a ref/customer, filter by status, payment and channel; check
+  `[pagination-summary]` and the per-status counts in the status dropdown.
+- **Expected:** the table, counts and pagination all update from the same query.
+
+### C18-02 — Export filtered orders to CSV
+- **Tier:** medium → `/orders`
+- **Task:** Apply a filter, click **Export CSV** (`[export-orders]`).
+- **Expected:** a real download; the file reflects the active filters, not the whole list.
+
+### C18-03 — Create an order with computed totals
+- **Tier:** medium → `/orders/new`
+- **Task:** Pick a customer, add line items (change quantity), submit `[create-order]`.
+- **Expected:** subtotal/shipping/tax/total compute live client-side (21% VAT, free
+  shipping over €150) and match the amounts stored on the created order; redirect to detail.
+
+### C18-04 — Drive the order state machine
+- **Tier:** hard → any `/orders/:id`
+- **Task:** **Create shipment**, then **Advance shipment** until delivered; try **Refund**
+  and **Cancel** and observe which actions are enabled per state.
+- **Expected:** each transition changes status badges and appends to `[shipment-timeline]`;
+  disabled actions must be respected, not clicked blindly.
+
+### C18-05 — Request a return
+- **Tier:** easy → a *delivered* `/orders/:id`
+- **Task:** Click **Request return** (`[request-return]`), pick a reason, confirm.
+- **Expected:** an `RMA-####` is created and appears under Returns on the order; the button
+  is disabled for non-delivered orders.
+
+### C18-06 — Work the fulfillment queue
+- **Tier:** medium → `/shipments`
+- **Task:** Filter by carrier/status, then **Advance** rows through the stages.
+- **Expected:** row shipment badges progress; delivered rows disable Advance and their order
+  flips to *delivered*.
+
+### C18-07 — Process an RMA
+- **Tier:** medium → `/returns`
+- **Task:** Approve a *requested* return, then mark it received and refund; also reject one.
+- **Expected:** status workflow (requested → approved/rejected → received → refunded) with
+  updated status counts.
 
 ---
 

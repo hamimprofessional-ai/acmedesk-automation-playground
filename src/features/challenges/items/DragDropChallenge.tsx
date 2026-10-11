@@ -46,7 +46,7 @@ export function DragDropChallenge() {
       selector='locator.dragTo() or a dispatchEvent drag sequence'
     >
       <div className="grid gap-5 sm:grid-cols-2">
-        <section className="space-y-2" data-testid="sortable-stage">
+        <section className="stage space-y-2">
           <h2 className="text-sm font-medium">Release checklist (drag to reorder)</h2>
           <ul className="space-y-1">
             {order.map((label, i) => (
@@ -57,9 +57,8 @@ export function DragDropChallenge() {
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={() => onDropReorder(i)}
                 onDragEnd={() => setDragIndex(null)}
-                data-testid={`sortable-item-${label}`}
                 className={cn(
-                  'cursor-grab rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900',
+                  'item cursor-grab rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900',
                   dragIndex === i && 'opacity-50',
                 )}
               >
@@ -69,12 +68,11 @@ export function DragDropChallenge() {
           </ul>
         </section>
 
-        <section className="space-y-2" data-testid="kanban-stage">
+        <section className="stage space-y-2">
           <h2 className="text-sm font-medium">Bulk actions</h2>
           <div className="grid grid-cols-2 gap-3">
             <div
-              className="min-h-32 rounded-lg border border-dashed border-slate-300 p-2 dark:border-slate-700"
-              data-testid="bucket-todo"
+              className="bucket min-h-32 rounded-lg border border-dashed border-slate-300 p-2 dark:border-slate-700"
               onDragOver={(e) => e.preventDefault()}
             >
               <p className="mb-2 text-xs uppercase tracking-wide text-slate-400">To do</p>
@@ -83,8 +81,7 @@ export function DragDropChallenge() {
                   key={card}
                   draggable
                   onDragStart={() => setDraggingCard(card)}
-                  data-testid={`card-${card}`}
-                  className="mb-1 cursor-grab rounded-md bg-slate-100 px-3 py-2 text-sm dark:bg-slate-800"
+                  className="item mb-1 cursor-grab rounded-md bg-slate-100 px-3 py-2 text-sm dark:bg-slate-800"
                 >
                   {card}
                 </div>
@@ -92,10 +89,9 @@ export function DragDropChallenge() {
             </div>
 
             <div
-              className="grid content-start rounded-lg border-2 border-dashed border-brand-300 bg-brand-50/40 p-3 dark:border-brand-800 dark:bg-brand-950/20"
+              className="bucket done grid content-start rounded-lg border-2 border-dashed border-brand-300 bg-brand-50/40 p-3 dark:border-brand-800 dark:bg-brand-950/20"
               onDragOver={(e) => e.preventDefault()}
               onDrop={() => draggingCard && moveToDone(draggingCard)}
-              data-testid="done-dropzone"
             >
               <span className="text-xs font-medium uppercase tracking-wide text-brand-600 dark:text-brand-400">
                 Done
@@ -113,7 +109,7 @@ export function DragDropChallenge() {
           </div>
         </section>
 
-        <section className="rounded-lg bg-slate-50 p-3 text-xs sm:col-span-2 dark:bg-slate-800/50" data-testid="dnd-log">
+        <section className="result log rounded-lg bg-slate-50 p-3 text-xs sm:col-span-2 dark:bg-slate-800/50">
           {history.length === 0 ? <span className="text-slate-400">Drag actions appear here…</span> : history.map((h) => <div key={h}>{h}</div>)}
         </section>
       </div>

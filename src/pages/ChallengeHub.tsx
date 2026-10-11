@@ -10,7 +10,7 @@ export function ChallengeHub() {
       <header className="space-y-2">
         <div className="flex items-center gap-2">
           <FlaskConical className="h-5 w-5 text-brand-600 dark:text-brand-400" />
-          <h1 className="text-xl font-semibold" data-testid="page-title">
+          <h1 className="text-xl font-semibold">
             Challenge Lab
           </h1>
         </div>
@@ -20,13 +20,12 @@ export function ChallengeHub() {
         </p>
       </header>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="challenge-grid">
+      <div className="challenge-grid grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {CHALLENGES.map((c) => (
           <Link
             key={c.slug}
             to={`/challenges/${c.slug}`}
-            data-testid={`challenge-card-${c.slug}`}
-            className="card group flex flex-col gap-2 p-4 transition hover:border-brand-400 hover:shadow-md"
+            className="challenge-card card group flex flex-col gap-2 p-4 transition hover:border-brand-400 hover:shadow-md"
           >
             <div className="flex items-start justify-between gap-2">
               <h2 className="font-medium">{c.title}</h2>

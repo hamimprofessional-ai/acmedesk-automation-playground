@@ -29,12 +29,11 @@ export function NativePromptsChallenge() {
       ]}
       selector='page.on("dialog", d => d.accept("Ada"))'
     >
-      <div className="space-y-4" data-testid="prompt-stage">
+      <div className="stage space-y-4">
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
             className="btn-secondary"
-            data-testid="trigger-alert"
             onClick={() => window.alert('This is a native alert.')}
           >
             Trigger alert()
@@ -42,7 +41,6 @@ export function NativePromptsChallenge() {
           <button
             type="button"
             className="btn-secondary"
-            data-testid="trigger-confirm"
             onClick={() => setConfirmResult(window.confirm('Delete all drafts?') ? 'confirmed' : 'cancelled')}
           >
             Trigger confirm()
@@ -50,7 +48,6 @@ export function NativePromptsChallenge() {
           <button
             type="button"
             className="btn-secondary"
-            data-testid="trigger-prompt"
             onClick={() => setPromptResult(window.prompt('Your name?', '') ?? null)}
           >
             Trigger prompt()
@@ -60,18 +57,17 @@ export function NativePromptsChallenge() {
         <label className="flex items-center gap-2 text-sm">
           <input
             type="checkbox"
-            data-testid="beforeunload-toggle"
             checked={warnGuard}
             onChange={(e) => setWarnGuard(e.target.checked)}
           />
           Warn before leaving (beforeunload)
         </label>
 
-        <div className="rounded-lg bg-slate-50 p-3 text-sm dark:bg-slate-800/50" data-testid="prompt-log">
-          confirm → <span data-testid="confirm-result">{confirmResult}</span>
+        <div className="log rounded-lg bg-slate-50 p-3 text-sm dark:bg-slate-800/50">
+          confirm → <span className="out">{confirmResult}</span>
           <br />
           prompt →{' '}
-          <span data-testid="prompt-result">{promptResult === undefined ? 'not run' : String(promptResult)}</span>
+          <span className="out">{promptResult === undefined ? 'not run' : String(promptResult)}</span>
         </div>
       </div>
     </ChallengeShell>

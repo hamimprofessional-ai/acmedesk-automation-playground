@@ -39,7 +39,7 @@ export function DetachedChallenge() {
         'Type a note and click Save before the field resets itself.',
         'Click "Claim bonus" before the banner removes itself in ~2.5s.',
       ]}
-      selector='getByTestId("ticker-UMBR") after pausing'
+      selector='li.row:has-text("UMBR")'
     >
       <div className="space-y-5">
         <div className="flex items-center justify-between">
@@ -47,19 +47,17 @@ export function DetachedChallenge() {
           <button
             type="button"
             className="btn-secondary"
-            data-testid="toggle-refresh"
             onClick={() => setPaused((p) => !p)}
           >
             {paused ? 'Resume refresh' : 'Pause refresh'}
           </button>
         </div>
 
-        <ul className="divide-y divide-slate-100 rounded-lg border border-slate-200 dark:divide-slate-800 dark:border-slate-700">
+        <ul className="list divide-y divide-slate-100 rounded-lg border border-slate-200 dark:divide-slate-800 dark:border-slate-700">
           {TICKERS.map((sym, i) => (
             <li
               key={paused ? sym : `${sym}-${generation}-${i}`}
-              className="flex items-center justify-between px-3 py-2 text-sm"
-              data-testid={`ticker-${sym}`}
+              className="row flex items-center justify-between px-3 py-2 text-sm"
             >
               <button
                 type="button"
@@ -83,35 +81,30 @@ export function DetachedChallenge() {
           }}
         >
           <div className="flex-1">
-            <label htmlFor="detached-note" className="label">
-              Investigation note
-            </label>
+            <label className="label">Investigation note</label>
             <input
-              id="detached-note"
-              data-testid="detached-note"
               className="input"
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="Resets every 5s unless paused"
             />
           </div>
-          <button type="submit" className="btn-primary" data-testid="save-note">
+          <button type="submit" className="btn-primary">
             Save note
           </button>
         </form>
         {savedNote && (
-          <p className="text-sm text-emerald-600 dark:text-emerald-400" data-testid="note-saved">
+          <p className="result text-sm text-emerald-600 dark:text-emerald-400">
             Saved: “{savedNote}”
           </p>
         )}
 
         {!gone && (
-          <div className="flex items-center justify-between rounded-lg bg-brand-50 px-4 py-3 text-sm dark:bg-brand-950/40" data-testid="ephemeral-banner">
+          <div className="banner flex items-center justify-between rounded-lg bg-brand-50 px-4 py-3 text-sm dark:bg-brand-950/40">
             <span>Quick! Claim your bonus before this banner vanishes.</span>
             <button
               type="button"
               className="btn-primary"
-              data-testid="claim-bonus"
               onClick={() => window.alert('Bonus claimed!')}
             >
               Claim bonus
