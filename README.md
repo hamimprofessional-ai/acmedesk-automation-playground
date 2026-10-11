@@ -39,6 +39,8 @@ have to *discover* triggers the way you would on a real site.
 - **Reports** — generate and download CSV/PDF reports
 - **Settings** — appearance, locale, navigation, integrations, and backend simulation
 - **Capabilities** — a self-documenting catalog of every testable behavior in the app
+- **Challenge Lab** — a hub of deliberately hard-to-automate widgets (shadow DOM, nested
+  iframes, moving targets, flaky network, drag & drop…) kept off the main pages
 
 It is **not** a real product. It's a hands-on practice playground: there is no
 authentication, no server, and no real data — everything runs in the browser.
@@ -67,6 +69,9 @@ authentication, no server, and no real data — everything runs in the browser.
   [@faker-js/faker](https://fakerjs.dev/) and frozen, so runs are reproducible.
 - **Configurable backend.** From **Settings → Backend simulation** you can inject
   latency, failure rates, and page sizes to test async/error handling.
+- **Deliberately hostile corners.** The **Challenge Lab** (`/challenges`) isolates the
+  scenarios that routinely break naive automation — shadow roots, churning IDs, moving
+  targets, flaky endpoints — without destabilising the main app.
 - **Real browser primitives.** Genuine history navigation, real `window.open`,
   real `Content-Disposition` downloads, real `FormData` uploads, and real
   cross-origin iframes.
@@ -96,6 +101,7 @@ same information is broken into **guided practice tasks** in
 | Locale / theme / RTL | Dark mode, English / Deutsch / العربية (RTL) |
 | `beforeunload` guard | Unsaved-changes prompt |
 | Interactive widgets | Accordion, rich text editor, date/time picker, carousel, off-canvas drawer, tooltips, radio group |
+| Challenge Lab | Shadow DOM (open/closed), nested & dynamic iframes, unstable IDs, moving targets, hover-only, occlusion, detached DOM, delayed async, flaky network, native prompts, logic gate, drag & drop |
 | Adversarial | Shadow DOM, hover-only triggers, occlusion/overlays, races, dynamic classes |
 
 ---
@@ -111,8 +117,10 @@ same information is broken into **guided practice tasks** in
 | `/customers` | Customers | List → profile, documents |
 | `/inventory` | Inventory | Stock table, low-stock report, CSV export |
 | `/reports` | Reports | Generate + download PDF/CSV reports |
-| `/settings` | Settings | Appearance, locale, navigation, integrations, backend simulation |
+| `/settings` | Settings | Appearance, locale, navigation, consent, integrations, backend simulation |
 | `/capabilities` | Capabilities | Searchable catalog of all testable behaviors |
+| `/challenges` | Challenge Lab | Hub of hard-to-automate widgets, grouped by tier |
+| `/challenges/:slug` | Challenge detail | One isolated challenge with goal, hints, and target selector |
 
 ---
 
@@ -216,7 +224,7 @@ practice-demo-site/
 - [`docs/design-spec.md`](docs/design-spec.md) — the *why*: goals, principles,
   product concept, tech choices, edge-case layer, mock API, and decisions log.
 - [`docs/scenarios.md`](docs/scenarios.md) — the *what*: a catalog of concrete
-  practice tasks (`C1`…`C16`, plus adversarial `AD-01`…), each with a difficulty
+  practice tasks (`C1`…`C17`, plus adversarial `AD-01`…), each with a difficulty
   tier, preconditions, task, and expected outcome.
 
 Start with the **Capabilities** page in-app for a friendly overview, then work through

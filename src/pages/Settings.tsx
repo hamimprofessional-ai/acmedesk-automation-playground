@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Save, Palette, Globe, Gauge, Plug, Truck, HelpCircle, PanelLeft } from 'lucide-react';
+import { Save, Palette, Globe, Gauge, Plug, Truck, HelpCircle, PanelLeft, Cookie } from 'lucide-react';
 import { useUIStore, type Density, type Theme, type SidebarMode } from '@/store/ui';
 import { LOCALES } from '@/lib/i18n';
 import { mockConfig } from '@/mocks/config';
@@ -249,12 +249,29 @@ export function Settings() {
             />
           </div>
         </div>
-        <div className="mt-4 flex items-center justify-between">
-          <button type="button" className="btn-ghost text-sm" onClick={resetConsent}>
-            Reset consent banner
-          </button>
-          <button type="button" className="btn-primary" data-testid="save-backend" onClick={applyMockConfig}>
+        <div className="mt-4 flex justify-end">
+          <button type="button" className="btn-primary" data-testid="save-simulation" onClick={applyMockConfig}>
             <Save className="h-4 w-4" /> Save
+          </button>
+        </div>
+      </section>
+
+      <section className="card p-5">
+        <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold">
+          <Cookie className="h-4 w-4" /> Privacy &amp; consent
+        </h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400">
+          Your cookie choice is stored in local storage. Reset it to show the consent banner again
+          on the next page load — handy for practising the overlay/occlusion scenario.
+        </p>
+        <div className="mt-4 flex justify-end">
+          <button
+            type="button"
+            className="btn-secondary text-sm"
+            data-testid="reset-consent"
+            onClick={resetConsent}
+          >
+            Reset consent banner
           </button>
         </div>
       </section>

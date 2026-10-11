@@ -8,6 +8,7 @@ import {
   FileBarChart,
   Settings as SettingsIcon,
   ListChecks,
+  FlaskConical,
   Search,
   Moon,
   Sun,
@@ -33,6 +34,7 @@ const navItems = [
   { to: '/inventory', key: 'nav.inventory', icon: Boxes },
   { to: '/reports', key: 'nav.reports', icon: FileBarChart },
   { to: '/settings', key: 'nav.settings', icon: SettingsIcon },
+  { to: '/challenges', key: 'nav.challenges', icon: FlaskConical },
   { to: '/capabilities', key: 'nav.capabilities', icon: ListChecks },
 ];
 

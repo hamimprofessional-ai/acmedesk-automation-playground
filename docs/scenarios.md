@@ -58,12 +58,14 @@ Tiers: `easy` · `medium` · `hard`.
 
 ## C2 — New window (window.open with features)
 
-### C2-01 — Pop out the live widget
+### C2-01 — Pop out widget with auto-refresh
 - **Tier:** medium
 - **Preconditions:** on `/` (dashboard)
-- **Task:** Click `[popout-widget]`.
+- **Task:** Click `[popout-widget]`, then wait.
 - **Expected:** a separate, resized **window** (480×380, no toolbar) opens showing
-  `[popout-widget-root]` with live KPIs. The tool must handle a window, not a tab.
+  `[popout-widget-root]` with live KPIs. After the loader, `[popout-auto-refresh]` appears
+  and the **whole window reloads itself every 10s** (loader shows again). The tool must
+  handle a window, not a tab, that refreshes on its own.
 
 ---
 
@@ -406,6 +408,88 @@ Tiers: `easy` · `medium` · `hard`.
 ### AD-09 — Race conditions / double submit
 - **Tier:** hard — submit buttons disable while pending (comment send, wizard submit,
   stock save). A tool that double-clicks must not create duplicates.
+
+---
+
+## C17 — Challenge Lab (hard-to-automate widgets)
+
+These pages are **intentionally hostile** to naive automation. They are isolated from the
+production pages (which keep stable ids). Hub: `/challenges`.
+
+### C17-01 — Shadow DOM
+- **Tier:** hard → `/challenges/shadow-dom`
+- **Task:** Fill the open shadow card (`[aria-label="Cardholder name"]`, inside
+  `acmedesk-shadow-open`), click **Save card**, read the status. Then click **Reveal code**
+  in the closed shadow root (`acmedesk-shadow-closed`) and capture the code.
+- **Expected:** open root is reachable via shadow-piercing selectors; the closed root is not —
+  you must interact via the host's accessible tree or positionally.
+
+### C17-02 — Nested & dynamic iframes
+- **Tier:** hard → `/challenges/nested-iframes`
+- **Task:** Switch into `[challenge-nested-iframe]`, then its child frame (2 levels). Spawn a
+  new frame (appears after ~800 ms), resize the outer frame, and toggle the hidden frame.
+- **Expected:** 2-level frame switching, waiting for a spawned frame, and frame
+  context resets between actions.
+
+### C17-03 — Unstable IDs & attributes
+- **Tier:** hard → `/challenges/unstable-ids`
+- **Task:** Tick consent, type a reason and submit — while every id/name/testid regenerates
+  on a 2 s timer. Then toggle **Freeze IDs**.
+- **Expected:** role/label-based locators survive; id-based selectors go stale.
+
+### C17-04 — Moving targets & layout shift
+- **Tier:** hard → `/challenges/moving-targets`
+- **Task:** Click the floating **Confirm** (moves every 1.2 s), click the **Shy** button
+  (dodges on hover), wait for the promo banner, dismiss it, then click **Proceed to checkout**.
+- **Expected:** click lands despite movement; the post-render banner shifts layout (stale
+  element positions must be re-read).
+
+### C17-05 — Hover-only controls
+- **Tier:** medium → `/challenges/hover-only`
+- **Task:** Hover each invoice row and click **Archive** / **Attach**; click **Download**
+  under a tooltip; reveal the tier text on hover.
+- **Expected:** actions only exist after hover; tooltip must not intercept the click.
+
+### C17-06 — Overlays & occlusion
+- **Tier:** medium → `/challenges/obscured`
+- **Task:** Close the ad overlay, then **Save preferences**; accept/decline the sticky cookie bar.
+- **Expected:** clicks on the covered button are intercepted until the overlay is dismissed.
+
+### C17-07 — Detached & self-resetting DOM
+- **Tier:** hard → `/challenges/detached`
+- **Task:** Pause the refresh, click the **UMBR** ticker; type a note and **Save** before it
+  clears; click **Claim bonus** before the banner removes itself (~2.5 s).
+- **Expected:** element handles go stale on re-render; the note field self-clears every 5 s
+  unless paused.
+
+### C17-08 — Delayed async rendering
+- **Tier:** medium → `/challenges/delayed-async`
+- **Task:** Wait for the skeleton to become rows (server delay 1.5–4.5 s); refresh; capture the
+  secret token that appears after a random 2–6 s.
+- **Expected:** no fixed sleeps — wait for the rows; the token is time-unpredictable.
+
+### C17-09 — Flaky network & retries
+- **Tier:** hard → `/challenges/flaky-network`
+- **Task:** Retry the ~50% 500 endpoint until success; retry the 429 endpoint past the limit;
+  trigger the slow endpoint and observe the 3 s client timeout; catch the intermittent element.
+- **Expected:** robust retry/backoff and error handling; assertions must tolerate failures.
+
+### C17-10 — Native dialogs
+- **Tier:** medium → `/challenges/native-prompts`
+- **Task:** Trigger `alert`/`confirm`/`prompt` and handle each; toggle the beforeunload guard.
+- **Expected:** a dialog handler must be registered before triggering, or the run hangs.
+
+### C17-11 — Logic & reasoning gate
+- **Tier:** hard → `/challenges/logic-gate`
+- **Task:** Compute the displayed product, click the **3rd** node, set the slider to the target
+  (±1), and type the displayed word exactly.
+- **Expected:** requires reading values and reasoning — no single selector answer.
+
+### C17-12 — Drag & drop
+- **Tier:** hard → `/challenges/drag-and-drop`
+- **Task:** Reorder the checklist so **Review metrics** is first; drag **Ship it** into **Done**.
+- **Expected:** HTML5 drag events (`dragstart`/`dragover`/`drop`) via `dragTo()` or a synthesized
+  event sequence.
 
 ---
 

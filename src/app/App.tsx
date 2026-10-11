@@ -11,6 +11,8 @@ import { Inventory } from '@/pages/Inventory';
 import { Reports } from '@/pages/Reports';
 import { Settings } from '@/pages/Settings';
 import { Capabilities } from '@/pages/Capabilities';
+import { ChallengeHub } from '@/pages/ChallengeHub';
+import { ChallengeDetail } from '@/pages/ChallengeDetail';
 import { NotFound } from '@/pages/NotFound';
 import { PopoutWidget } from '@/pages/PopoutWidget';
 import { applyDocumentChrome, useUIStore } from '@/store/ui';
@@ -46,6 +48,8 @@ export default function App() {
           <Route path="/reports" element={<Reports />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/capabilities" element={<Capabilities />} />
+          <Route path="/challenges" element={<ChallengeHub />} />
+          <Route path="/challenges/:slug" element={<ChallengeDetail />} />
           <Route path="/404" element={<NotFound />} />
           <Route path="*" element={<Navigate to="/404" replace />} />
         </Route>

@@ -7,6 +7,9 @@ const ok = <T>(data: T) => HttpResponse.json(data as object);
 const fail = (status: number, message: string) =>
   HttpResponse.json({ message }, { status });
 
+// Rolling counter for the Challenge Lab rate-limit endpoint.
+let rateLimitHits = 0;
+
 async function sim(delayOverride?: number) {
   const ms = delayOverride ?? mockConfig.latencyMs;
   if (ms > 0) await delay(ms);
@@ -394,6 +397,46 @@ export const handlers = [
       byCategory,
       volume,
     });
+  }),
+
+  // ----- Challenge Lab endpoints -------------------------------------------
+  http.get('/api/challenges/slow', async () => {
+    const latencyMs = Math.round(1500 + Math.random() * 3000);
+    await delay(latencyMs);
+    return ok({
+      latencyMs,
+      servedAt: new Date().toISOString(),
+      items: [
+        { id: 'api', label: 'API calls', value: 1284 + Math.round(Math.random() * 500) },
+        { id: 'seats', label: 'Seats in use', value: 34 },
+        { id: 'storage', label: 'Storage (GB)', value: 128 },
+        { id: 'jobs', label: 'Queued jobs', value: Math.round(Math.random() * 20) },
+      ],
+    });
+  }),
+
+  http.get('/api/challenges/flaky', async () => {
+    await delay(300);
+    if (Math.random() < 0.5) return fail(500, 'Upstream error (simulated)');
+    return ok({ value: Math.round((120 + Math.random() * 4800) * 100) / 100 });
+  }),
+
+  http.get('/api/challenges/ratelimit', async () => {
+    await delay(200);
+    rateLimitHits += 1;
+    if (rateLimitHits <= 2) {
+      return new HttpResponse(JSON.stringify({ message: 'Too many requests — retry shortly' }), {
+        status: 429,
+        headers: { 'Content-Type': 'application/json', 'Retry-After': '1' },
+      });
+    }
+    rateLimitHits = 0;
+    return ok({ ok: true });
+  }),
+
+  http.get('/api/challenges/timeout', async () => {
+    await delay(6000);
+    return ok({ ok: true });
   }),
 
   // ----- Nested iframe: vendor portal (level 1) embedding status widget (level 2) --
