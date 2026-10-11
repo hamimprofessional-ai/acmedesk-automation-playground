@@ -11,13 +11,14 @@ import {
   YAxis,
 } from 'recharts';
 import { Link } from 'react-router-dom';
-import { Ticket, Users, Boxes, AlertOctagon, ExternalLink, ArrowUpRight } from 'lucide-react';
+import { Ticket, Users, Boxes, AlertOctagon, ExternalLink, ArrowUpRight, Headphones, FileBarChart, Truck } from 'lucide-react';
 import { apiGet } from '@/lib/api';
 import type { Activity } from '@/mocks/data';
 import type { DashboardStats } from '@/lib/types';
 import { formatNumber, relativeTime } from '@/lib/format';
 import { useTranslation } from '@/lib/i18n';
 import { LoadingBlock, ErrorState } from '@/components/States';
+import { Carousel, type CarouselSlide } from '@/components/Carousel';
 
 function Kpi({
   label,
@@ -77,6 +78,41 @@ export function Dashboard() {
   const stats = statsQuery.data!;
   const categoryData = Object.entries(stats.byCategory).map(([name, count]) => ({ name, count }));
 
+  const spotlights: CarouselSlide[] = [
+    {
+      id: 'sla',
+      subtitle: 'Support',
+      title: 'Keep first-response under SLA',
+      body: `${stats.openTickets} open tickets are in the queue. Urgent items breach after 1 hour.`,
+      icon: <Headphones className="h-7 w-7" />,
+      tone: 'bg-brand-100 text-brand-700 dark:bg-brand-950 dark:text-brand-300',
+    },
+    {
+      id: 'stock',
+      subtitle: 'Operations',
+      title: 'Replenish low-stock SKUs',
+      body: 'Products at or below their reorder level are flagged for a purchase order.',
+      icon: <Boxes className="h-7 w-7" />,
+      tone: 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300',
+    },
+    {
+      id: 'reports',
+      subtitle: 'Analytics',
+      title: 'Weekly operations report',
+      body: 'Generate and download a PDF roll-up of ticket volume and resolution times.',
+      icon: <FileBarChart className="h-7 w-7" />,
+      tone: 'bg-sky-100 text-sky-700 dark:bg-sky-950 dark:text-sky-300',
+    },
+    {
+      id: 'vendor',
+      subtitle: 'Partners',
+      title: 'ParcelPal shipments syncing',
+      body: 'The vendor portal refreshes in-transit counts every 15 minutes.',
+      icon: <Truck className="h-7 w-7" />,
+      tone: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300',
+    },
+  ];
+
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -124,6 +160,8 @@ export function Dashboard() {
           to="/customers"
         />
       </div>
+
+      <Carousel testId="dashboard-spotlight" slides={spotlights} />
 
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="card p-5 lg:col-span-2">

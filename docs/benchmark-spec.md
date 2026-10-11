@@ -99,6 +99,7 @@ Each capability is tied to a concrete, realistic location in the app.
 | C13 | Clipboard / print | Copy ticket ID; print a report (`window.print`) |
 | C14 | Locale / theme / RTL | Settings toggle: dark mode, locale switch incl. RTL + non-Latin |
 | C15 | `beforeunload` guard | Leave wizard with unsaved changes |
+| C16 | Interactive widgets | Accordion, rich text editor, date/time picker, carousel (prev/next), nav drawer with pinned/drawer preference, tooltips |
 
 Excluded from v1 (future): auth, roles, session expiry, payments.
 

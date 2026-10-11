@@ -382,6 +382,67 @@ const GROUPS: CapabilityGroup[] = [
       },
     ],
   },
+  {
+    title: 'Interactive widgets',
+    items: [
+      {
+        name: 'Accordion (collapsible sections)',
+        page: 'Settings',
+        to: '/settings',
+        trigger: 'Help & FAQ → click a section header to expand/collapse',
+        selector: 'data-testid="settings-accordion-<id>"',
+        tier: 'easy',
+      },
+      {
+        name: 'Rich text editor (contentEditable + toolbar)',
+        page: 'Ticket wizard',
+        to: '/tickets/new',
+        trigger: 'Step 2 → select text and click B / I / U / list buttons in the description editor',
+        selector: 'data-testid="wizard-description-editor" / "wizard-description-bold"',
+        tier: 'medium',
+      },
+      {
+        name: 'Date & time picker',
+        page: 'Ticket wizard',
+        to: '/tickets/new',
+        trigger: 'Step 2 → open the "Due date & time" input',
+        selector: 'data-testid="wizard-due-date"',
+        tier: 'medium',
+      },
+      {
+        name: 'Carousel / slider with Prev & Next',
+        page: 'Dashboard',
+        to: '/',
+        trigger: 'Use the ‹ / › buttons (or click a dot) on the spotlight card',
+        selector: 'data-testid="dashboard-spotlight-prev" / "-next"',
+        tier: 'easy',
+      },
+      {
+        name: 'Navigation drawer (off-canvas)',
+        page: 'Global',
+        to: '/',
+        trigger: 'Click the ☰ button in the topbar; the drawer slides in over a backdrop. Close via backdrop, Escape, or a nav link.',
+        selector: 'data-testid="nav-drawer-toggle" / "sidebar"',
+        tier: 'medium',
+      },
+      {
+        name: 'Radio group (sidebar display preference)',
+        page: 'Settings',
+        to: '/settings',
+        trigger: 'Navigation → choose "Always open (pinned)" or "Collapsed (drawer)"; the desktop layout changes accordingly',
+        selector: 'data-testid="settings-sidebar-mode-pinned" / "-drawer"',
+        tier: 'medium',
+      },
+      {
+        name: 'Tooltips on icon buttons',
+        page: 'Global (topbar) / Tickets',
+        to: '/tickets',
+        trigger: 'Hover the theme-toggle, notification bell or a row action icon',
+        selector: 'data-testid="tooltip-theme" / "tooltip-notifications"',
+        tier: 'easy',
+      },
+    ],
+  },
 ];
 
 const TIER_STYLES: Record<Tier, string> = {

@@ -21,8 +21,10 @@ import { NotificationBell } from '@/components/NotificationBell';
 import { ConsentBanner } from '@/components/ConsentBanner';
 import { ToastHost } from '@/components/ToastHost';
 import { HoverClickDropdown } from '@/components/HoverClickDropdown';
+import { Tooltip } from '@/components/Tooltip';
 import { toast } from '@/store/toast';
 import { cn } from '@/lib/cn';
+import { useMediaQuery } from '@/lib/useMediaQuery';
 
 const navItems = [
   { to: '/', key: 'nav.dashboard', icon: LayoutDashboard, end: true },
@@ -42,9 +44,27 @@ export function Layout() {
   const locale = useUIStore((s) => s.locale);
   const setLocale = useUIStore((s) => s.setLocale);
   const sidebarOpen = useUIStore((s) => s.sidebarOpen);
+  const sidebarMode = useUIStore((s) => s.sidebarMode);
   const toggleSidebar = useUIStore((s) => s.toggleSidebar);
+  const closeSidebar = useUIStore((s) => s.closeSidebar);
+  const isDesktop = useMediaQuery('(min-width: 768px)');
+  const pinned = sidebarMode === 'pinned' && isDesktop;
+  const showSidebar = pinned || sidebarOpen;
   const [q, setQ] = useState('');
   const searchRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!sidebarOpen) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeSidebar();
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [sidebarOpen, closeSidebar]);
+
+  useEffect(() => {
+    closeSidebar();
+  }, [closeSidebar]);
 
   // Keyboard shortcut: "/" focuses the global search.
   useEffect(() => {
@@ -70,12 +90,22 @@ export function Layout() {
       <ToastHost />
       <ConsentBanner />
 
+      {showSidebar && !pinned && (
+        <div
+          className="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm"
+          onClick={toggleSidebar}
+          aria-hidden="true"
+        />
+      )}
+
       <aside
         className={cn(
-          'sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-e border-slate-200 bg-white md:flex dark:border-slate-800 dark:bg-slate-900',
-          !sidebarOpen && 'md:hidden',
+          'fixed inset-y-0 start-0 z-50 flex h-screen w-60 flex-col border-e border-slate-200 bg-white transition-transform duration-200 ease-out dark:border-slate-800 dark:bg-slate-900',
+          pinned ? 'md:z-30' : 'shadow-xl',
+          showSidebar ? 'translate-x-0' : '-translate-x-full rtl:translate-x-full',
         )}
         data-testid="sidebar"
+        data-sidebar-pinned={pinned ? 'true' : 'false'}
       >
         <Link to="/" className="flex items-center gap-2 px-5 py-5">
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 font-bold text-white">
@@ -89,6 +119,7 @@ export function Layout() {
               key={to}
               to={to}
               end={end}
+              onClick={closeSidebar}
               className={({ isActive }) =>
                 cn(
                   'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
@@ -108,12 +139,14 @@ export function Layout() {
         </div>
       </aside>
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className={cn('flex min-w-0 flex-1 flex-col', pinned && 'md:ps-60')}>
         <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur dark:border-slate-800 dark:bg-slate-900/90">
           <button
             type="button"
-            className="btn-ghost px-2 md:hidden"
+            className={cn('btn-ghost px-2', pinned && 'md:hidden')}
             aria-label="Toggle navigation"
+            aria-expanded={showSidebar}
+            data-testid="nav-drawer-toggle"
             onClick={toggleSidebar}
           >
             <Menu className="h-5 w-5" />
@@ -148,16 +181,20 @@ export function Layout() {
                 </option>
               ))}
             </select>
-            <button
-              type="button"
-              data-testid="theme-toggle"
-              aria-label="Toggle theme"
-              onClick={toggleTheme}
-              className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
-            >
-              {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
-            </button>
-            <NotificationBell />
+            <Tooltip label="Toggle theme" side="bottom" testId="tooltip-theme">
+              <button
+                type="button"
+                data-testid="theme-toggle"
+                aria-label="Toggle theme"
+                onClick={toggleTheme}
+                className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+              >
+                {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+              </button>
+            </Tooltip>
+            <Tooltip label="Notifications" side="bottom" testId="tooltip-notifications">
+              <NotificationBell />
+            </Tooltip>
             <HoverClickDropdown
               testId="profile-menu"
               ariaLabel="Account menu"

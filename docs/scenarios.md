@@ -34,6 +34,7 @@ Tiers: `easy` · `medium` · `hard`.
 | C13 Clipboard / print | C13-01, C13-02 |
 | C14 Locale / theme / RTL | C14-01, C14-02 |
 | C15 beforeunload guard | C15-01 |
+| C16 Interactive widgets | C16-01 … C16-07 |
 | Adversarial | AD-01 … AD-09 |
 
 ---
@@ -302,6 +303,59 @@ Tiers: `easy` · `medium` · `hard`.
 - **Preconditions:** `/tickets/new` with entered data.
 - **Task:** Trigger a page unload (e.g. reload or navigate away).
 - **Expected:** browser shows the native "Leave site?" beforeunload prompt.
+
+---
+
+## C16 — Interactive widgets
+
+### C16-01 — Accordion
+- **Tier:** easy
+- **Preconditions:** `/settings` (Help & FAQ section).
+- **Task:** Click `[settings-accordion-sla]`, then another header.
+- **Expected:** the panel expands (`[settings-accordion-sla-panel]`); opening a second collapses
+  the first (single-open accordion); `aria-expanded` flips.
+
+### C16-02 — Rich text editor
+- **Tier:** medium
+- **Preconditions:** `/tickets/new` step 2 (Details).
+- **Task:** Type into `[wizard-description-editor]`, select the text, click `[wizard-description-bold]`.
+- **Expected:** the selection is wrapped in `<b>`/`<strong>` inside the contentEditable; the
+  toolbar must be used without losing the text selection.
+
+### C16-03 — Date & time picker
+- **Tier:** medium
+- **Preconditions:** `/tickets/new` step 2.
+- **Task:** Set a value in `[wizard-due-date]` (native `datetime-local`).
+- **Expected:** the control accepts both a date and a time; the value shows on the review step.
+
+### C16-04 — Carousel with Prev / Next
+- **Tier:** easy
+- **Preconditions:** `/`.
+- **Task:** Click `[dashboard-spotlight-next]` twice, then `[dashboard-spotlight-prev]`.
+- **Expected:** the active slide changes; the position indicator (`[dashboard-spotlight-position]`)
+  and the dots update; `next` wraps around from the last slide to the first.
+
+### C16-05 — Navigation drawer (off-canvas)
+- **Tier:** medium
+- **Preconditions:** `/settings` → Navigation set to "Collapsed (drawer)", desktop viewport.
+- **Task:** Click `[nav-drawer-toggle]` to open the drawer, then close it via the backdrop, Escape, or by picking a nav item.
+- **Expected:** `[sidebar]` slides in over a dimmed backdrop (closed by default on load); Escape and
+  backdrop clicks close it; selecting a link navigates and closes the drawer.
+
+### C16-06 — Tooltips
+- **Tier:** easy
+- **Preconditions:** on `/tickets`.
+- **Task:** Hover the theme toggle, the bell, and a row's "new tab" icon.
+- **Expected:** a tooltip appears (`[tooltip-theme]`, `[tooltip-notifications]`,
+  `[tooltip-newtab-<ref>]`) and disappears on mouse-out.
+
+### C16-07 — Sidebar display preference (radio group)
+- **Tier:** medium
+- **Preconditions:** `/settings` (Navigation section), desktop viewport.
+- **Task:** Select `[settings-sidebar-mode-pinned]` and `[settings-sidebar-mode-drawer]` (native radios in `[settings-sidebar-mode]`).
+- **Expected:** on "pinned" the sidebar is docked and content shifts right (☰ hidden); on "drawer"
+  the sidebar collapses off-canvas and the ☰ button appears. The choice persists across reloads and
+  only affects desktop — mobile always uses the drawer.
 
 ---
 

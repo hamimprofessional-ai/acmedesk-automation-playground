@@ -9,8 +9,13 @@ import type { Paginated } from '@/lib/types';
 import { toast } from '@/store/toast';
 import { cn } from '@/lib/cn';
 import { TagInput } from '@/features/webcomponents/TagInput';
+import { RichTextEditor } from '@/components/RichTextEditor';
 
 const STEPS = ['Customer & subject', 'Details', 'Review'];
+
+function plainText(html: string) {
+  return html.replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').trim();
+}
 
 export function NewTicketWizard() {
   const navigate = useNavigate();
@@ -22,6 +27,7 @@ export function NewTicketWizard() {
     priority: 'medium',
     category: 'Technical',
     description: '',
+    dueDate: '',
     tags: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -32,7 +38,7 @@ export function NewTicketWizard() {
   });
 
   const dirty = useMemo(
-    () => JSON.stringify(form) !== JSON.stringify({ customerId: '', subject: '', priority: 'medium', category: 'Technical', description: '', tags: '' }),
+    () => JSON.stringify(form) !== JSON.stringify({ customerId: '', subject: '', priority: 'medium', category: 'Technical', description: '', dueDate: '', tags: '' }),
     [form],
   );
 
@@ -68,7 +74,7 @@ export function NewTicketWizard() {
       if (form.subject.trim().length < 4) next.subject = 'Subject must be at least 4 characters';
     }
     if (step === 1) {
-      if (form.description.trim().length < 10) next.description = 'Provide at least 10 characters';
+      if (plainText(form.description).length < 10) next.description = 'Provide at least 10 characters';
     }
     setErrors(next);
     return Object.keys(next).length === 0;
@@ -185,16 +191,31 @@ export function NewTicketWizard() {
             </div>
             <div>
               <label className="label" htmlFor="description">
-                Description
+                Description (rich text)
               </label>
-              <textarea
-                id="description"
-                className="input min-h-28"
-                data-testid="wizard-description"
+              <RichTextEditor
+                testId="wizard-description"
                 value={form.description}
-                onChange={(e) => set('description', e.target.value)}
+                onChange={(html) => set('description', html)}
+                placeholder="Describe the issue — use the toolbar for formatting"
               />
               {errors.description && <p className="mt-1 text-xs text-rose-500">{errors.description}</p>}
+            </div>
+            <div>
+              <label className="label" htmlFor="duedate">
+                Due date &amp; time
+              </label>
+              <input
+                id="duedate"
+                type="datetime-local"
+                className="input max-w-xs"
+                data-testid="wizard-due-date"
+                value={form.dueDate}
+                onChange={(e) => set('dueDate', e.target.value)}
+              />
+              <p className="mt-1 text-xs text-slate-400">
+                Optional — when the follow-up is due.
+              </p>
             </div>
             <div>
               <label className="label">Tags (shadow DOM input)</label>
@@ -212,7 +233,8 @@ export function NewTicketWizard() {
             />
             <Review label="Priority" value={form.priority} />
             <Review label="Category" value={form.category} />
-            <Review label="Description" value={form.description || '—'} />
+            <Review label="Description" value={plainText(form.description) || '—'} />
+            <Review label="Due date" value={form.dueDate ? form.dueDate.replace('T', ' ') : '—'} />
             <Review label="Tags" value={form.tags || '—'} />
           </dl>
         )}
