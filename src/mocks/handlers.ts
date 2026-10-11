@@ -4,6 +4,7 @@ import {
   CARRIERS,
   ORDER_STATUSES,
   RETURN_STATUSES,
+  SHIPMENT_STAGES,
   type Order,
   type OrderChannel,
   type OrderLine,
@@ -476,32 +477,57 @@ export const handlers = [
     return ok({ order: db.orders[idx], event });
   }),
 
-  http.post('/api/orders/:id/advance', async ({ params }) => {
+  http.post('/api/orders/:id/advance', async ({ params, request }) => {
     if (await sim()) return fail(500, 'Could not advance shipment');
     const order = db.orders.find((x) => x.id === params.id);
     if (!order) return fail(404, 'Order not found');
+    const body = (await request.json().catch(() => ({}))) as { stage?: ShipmentStage };
     const events = db.shipments.filter((s) => s.orderId === order.id);
     const current = events.length ? events[events.length - 1].stage : 'label_created';
     const next =
-      SHIPMENT_PROGRESSION[Math.min(SHIPMENT_PROGRESSION.indexOf(current) + 1, SHIPMENT_PROGRESSION.length - 1)];
+      body.stage && SHIPMENT_STAGES.includes(body.stage)
+        ? body.stage
+        : SHIPMENT_PROGRESSION[Math.min(SHIPMENT_PROGRESSION.indexOf(current) + 1, SHIPMENT_PROGRESSION.length - 1)];
     const now = new Date().toISOString();
+    const carrier = order.carrier ?? fakerCarrier();
+    const trackingNumber = order.trackingNumber ?? Math.random().toString(36).slice(2, 13).toUpperCase();
     const event: ShipmentEvent = {
       id: crypto.randomUUID(),
       orderId: order.id,
       orderRef: order.ref,
       stage: next,
-      carrier: order.carrier ?? fakerCarrier(),
-      trackingNumber: order.trackingNumber ?? Math.random().toString(36).slice(2, 13).toUpperCase(),
+      carrier,
+      trackingNumber,
       location: 'Sorting facility',
       note: `Shipment ${next.replace(/_/g, ' ')}`,
       at: now,
     };
     db.shipments.push(event);
-    if (next === 'delivered') {
-      const idx = db.orders.findIndex((x) => x.id === order.id);
-      db.orders[idx] = { ...order, status: 'delivered', updatedAt: now };
-    }
+    const idx = db.orders.findIndex((x) => x.id === order.id);
+    db.orders[idx] = {
+      ...order,
+      carrier,
+      trackingNumber,
+      status: next === 'delivered' ? 'delivered' : 'shipped',
+      updatedAt: now,
+    };
     return ok(event);
+  }),
+
+  http.post('/api/orders/:id/reset-shipment', async ({ params }) => {
+    if (await sim()) return fail(500, 'Could not reset shipment');
+    const idx = db.orders.findIndex((x) => x.id === params.id);
+    if (idx === -1) return fail(404, 'Order not found');
+    const order = db.orders[idx];
+    db.shipments = db.shipments.filter((s) => s.orderId !== order.id);
+    db.orders[idx] = {
+      ...order,
+      status: 'processing',
+      carrier: undefined,
+      trackingNumber: undefined,
+      updatedAt: new Date().toISOString(),
+    };
+    return ok(db.orders[idx]);
   }),
 
   http.post('/api/orders/:id/refund', async ({ params }) => {
@@ -543,7 +569,7 @@ export const handlers = [
         const latest = events[events.length - 1];
         return {
           orderId: o.id,
-          ref: o.ref,
+          orderRef: o.ref,
           customerName: o.customerName,
           status: o.status,
           carrier: o.carrier ?? '—',
@@ -557,7 +583,7 @@ export const handlers = [
       .filter((row) => {
         if (status && row.status !== status) return false;
         if (carrier && row.carrier !== carrier) return false;
-        if (q && !`${row.ref} ${row.customerName} ${row.trackingNumber}`.toLowerCase().includes(q)) {
+        if (q && !`${row.orderRef} ${row.customerName} ${row.trackingNumber}`.toLowerCase().includes(q)) {
           return false;
         }
         return true;

@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Ban, PackageCheck, RotateCcw, Truck } from 'lucide-react';
+import { ArrowLeft, Ban, RotateCcw, Truck } from 'lucide-react';
 import { apiGet, apiPost } from '@/lib/api';
-import type { Order, ReturnRequest, ShipmentEvent } from '@/mocks/data';
-import { RETURN_REASONS } from '@/mocks/data';
-import { formatCurrency, formatDate, relativeTime } from '@/lib/format';
+import type { Order, ReturnRequest, ShipmentEvent, ShipmentStage } from '@/mocks/data';
+import { RETURN_REASONS, SHIPMENT_FLOW } from '@/mocks/data';
+import { formatCurrency, formatDate, formatDateTime } from '@/lib/format';
 import { toast } from '@/store/toast';
 import { OrderStatusBadge, PaymentBadge, ShipmentBadge, ReturnBadge } from '@/components/Badges';
 import { Modal } from '@/components/Modal';
@@ -40,7 +40,7 @@ export function OrderDetail() {
     onError,
   });
   const advance = useMutation({
-    mutationFn: () => apiPost(`/api/orders/${id}/advance`, {}),
+    mutationFn: (stage: ShipmentStage) => apiPost(`/api/orders/${id}/advance`, { stage }),
     onSuccess: () => {
       toast.success('Shipment advanced');
       invalidate();
@@ -79,11 +79,13 @@ export function OrderDetail() {
 
   const { order, shipments, returns } = data;
   const latest = shipments[shipments.length - 1];
+  const currentStage = latest?.stage;
+  const currentIdx = currentStage ? SHIPMENT_FLOW.indexOf(currentStage) : -1;
+  const nextStage = currentIdx >= 0 ? SHIPMENT_FLOW[currentIdx + 1] : undefined;
   const canShip = order.status === 'pending' || order.status === 'processing';
-  const canAdvance = !!latest && latest.stage !== 'delivered';
   const canRefund = order.paymentStatus === 'paid' && order.status !== 'refunded';
   const canCancel = order.status === 'pending' || order.status === 'processing';
-  const canReturn = order.status === 'delivered';
+  const canReturn = order.status === 'delivered' && returns.length === 0;
 
   return (
     <div className="mx-auto max-w-6xl space-y-4">
@@ -123,15 +125,34 @@ export function OrderDetail() {
         >
           <Truck className="h-4 w-4" /> Create shipment
         </button>
-        <button
-          type="button"
-          className="btn-secondary"
-          data-testid="advance-shipment"
-          disabled={!canAdvance || advance.isPending}
-          onClick={() => advance.mutate()}
+        <select
+          id="shipment-stage"
+          aria-label="Shipment stage"
+          className="input w-56"
+          data-testid="shipment-stage"
+          value={currentIdx >= 0 ? currentStage : ''}
+          disabled={advance.isPending}
+          onChange={(e) => {
+            if (e.target.value === nextStage) advance.mutate(e.target.value as ShipmentStage);
+          }}
         >
-          <PackageCheck className="h-4 w-4" /> Advance shipment
-        </button>
+          {currentIdx < 0 && (
+            <option value="">
+              Shipment Stage: {currentStage ? currentStage.replace(/_/g, ' ') : 'Not shipped yet'}
+            </option>
+          )}
+          {SHIPMENT_FLOW.map((stage) => {
+            const idx = SHIPMENT_FLOW.indexOf(stage);
+            const isCurrent = idx === currentIdx;
+            const isNext = currentIdx >= 0 && idx === currentIdx + 1;
+            return (
+              <option key={stage} value={stage} disabled={!isNext && !isCurrent}>
+                Shipment Stage: {stage.replace(/_/g, ' ')}
+                {isNext ? ' (next)' : ''}
+              </option>
+            );
+          })}
+        </select>
         <button
           type="button"
           className="btn-secondary"
@@ -222,9 +243,11 @@ export function OrderDetail() {
                 {shipments.map((s) => (
                   <li key={s.id} className="relative ps-5">
                     <span className="absolute start-0 top-1.5 h-2 w-2 rounded-full bg-brand-500" />
-                    <p className="text-sm font-medium capitalize">{s.stage.replace(/_/g, ' ')}</p>
+                    <p className="text-sm font-medium capitalize">
+                      Shipment Stage: {s.stage.replace(/_/g, ' ')}
+                    </p>
                     <p className="text-xs text-slate-400">
-                      {s.location} · {relativeTime(s.at)}
+                      {s.location} · {formatDateTime(s.at)}
                     </p>
                   </li>
                 ))}

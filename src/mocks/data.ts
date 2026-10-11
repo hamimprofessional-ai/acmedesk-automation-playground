@@ -299,6 +299,13 @@ export const SHIPMENT_STAGES: ShipmentStage[] = [
   'delivered',
   'exception',
 ];
+export const SHIPMENT_FLOW: ShipmentStage[] = [
+  'label_created',
+  'picked_up',
+  'in_transit',
+  'out_for_delivery',
+  'delivered',
+];
 export const RETURN_STATUSES: ReturnStatus[] = [
   'requested',
   'approved',
@@ -424,7 +431,7 @@ export const shipments: ShipmentEvent[] = orders.flatMap((o) => {
 });
 
 export const returns: ReturnRequest[] = orders
-  .filter((o) => o.status === 'delivered' || o.status === 'refunded')
+  .filter((o) => o.status === 'refunded')
   .slice(0, 18)
   .map((o, i) => {
     const status = weighted<ReturnStatus>([

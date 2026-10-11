@@ -584,7 +584,7 @@ const GROUPS: CapabilityGroup[] = [
         name: 'Order detail state machine',
         page: 'Order detail',
         to: '/orders',
-        trigger: 'Create shipment → Advance → Refund / Cancel; tracking timeline grows',
+        trigger: 'Create shipment, then pick the next step from the stage dropdown (only one step enabled)',
         tier: 'hard',
       },
       {
@@ -596,11 +596,11 @@ const GROUPS: CapabilityGroup[] = [
         tier: 'easy',
       },
       {
-        name: 'Fulfillment queue with per-row advance',
+        name: 'Fulfillment queue with per-row action menu',
         page: 'Shipments',
         to: '/shipments',
-        trigger: 'Filter by carrier, then "Advance" a row through the stages',
-        selector: 'data-testid="shipments-table"',
+        trigger: 'Filter by carrier, open a row menu → Advance / Mark exception / Reset tracking',
+        selector: 'data-testid="shipment-menu-<ref>"',
         tier: 'medium',
       },
       {

@@ -1,12 +1,14 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { PackageCheck } from 'lucide-react';
+import { AlertTriangle, MoreHorizontal, PackageCheck, RotateCcw } from 'lucide-react';
 import { apiGet, apiPost } from '@/lib/api';
 import type { OrderStatus, ShipmentStage } from '@/mocks/data';
 import type { Paginated } from '@/lib/types';
 import { toast } from '@/store/toast';
 import { OrderStatusBadge, ShipmentBadge } from '@/components/Badges';
+import { DropdownMenu } from '@/components/DropdownMenu';
+import { type ContextMenuItem } from '@/components/ContextMenu';
 import { Pagination } from '@/components/Pagination';
 import { LoadingBlock, ErrorState, EmptyState } from '@/components/States';
 
@@ -29,6 +31,7 @@ export function Shipments() {
   const [status, setStatus] = useState('');
   const [carrier, setCarrier] = useState('');
   const [page, setPage] = useState(1);
+  const [rowMenu, setRowMenu] = useState<{ anchor: DOMRect; row: QueueRow } | null>(null);
   const qc = useQueryClient();
 
   const params = useMemo(
@@ -41,14 +44,46 @@ export function Shipments() {
     queryFn: () => apiGet<ShipmentsResponse>('/api/shipments', params as never),
   });
 
-  const advance = useMutation({
-    mutationFn: (orderId: string) => apiPost(`/api/orders/${orderId}/advance`, {}),
-    onSuccess: () => {
-      toast.success('Shipment advanced');
+  const action = useMutation({
+    mutationFn: ({ orderId, path, stage }: { orderId: string; path: string; stage?: ShipmentStage }) =>
+      apiPost(`/api/orders/${orderId}/${path}`, stage ? { stage } : {}),
+    onSuccess: (_res, vars) => {
+      toast.success(vars.path === 'reset-shipment' ? 'Tracking reset' : 'Shipment updated');
       qc.invalidateQueries({ queryKey: ['shipments'] });
     },
     onError: (e) => toast.error((e as Error).message),
   });
+
+  function rowItems(r: QueueRow): ContextMenuItem[] {
+    if (r.stage === 'delivered') {
+      return [
+        {
+          label: 'Reset tracking',
+          icon: <RotateCcw className="h-3.5 w-3.5" />,
+          danger: true,
+          onClick: () => action.mutate({ orderId: r.orderId, path: 'reset-shipment' }),
+        },
+      ];
+    }
+    return [
+      {
+        label: 'Advance to next stage',
+        icon: <PackageCheck className="h-3.5 w-3.5" />,
+        onClick: () => action.mutate({ orderId: r.orderId, path: 'advance' }),
+      },
+      {
+        label: 'Mark exception',
+        icon: <AlertTriangle className="h-3.5 w-3.5" />,
+        onClick: () => action.mutate({ orderId: r.orderId, path: 'advance', stage: 'exception' }),
+      },
+      {
+        label: 'Reset tracking',
+        icon: <RotateCcw className="h-3.5 w-3.5" />,
+        danger: true,
+        onClick: () => action.mutate({ orderId: r.orderId, path: 'reset-shipment' }),
+      },
+    ];
+  }
 
   const items = data?.items ?? [];
 
@@ -156,12 +191,18 @@ export function Shipments() {
                       <td className="px-4 py-2.5 text-right">
                         <button
                           type="button"
-                          className="btn-ghost px-2 py-1 text-xs"
-                          data-testid="advance"
-                          disabled={r.stage === 'delivered' || advance.isPending}
-                          onClick={() => advance.mutate(r.orderId)}
+                          aria-label={`Actions for ${r.orderRef}`}
+                          aria-haspopup="menu"
+                          data-testid={`shipment-menu-${r.orderRef}`}
+                          onClick={(e) =>
+                            setRowMenu({
+                              anchor: (e.currentTarget as HTMLElement).getBoundingClientRect(),
+                              row: r,
+                            })
+                          }
+                          className="rounded-md p-1.5 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700"
                         >
-                          <PackageCheck className="h-3.5 w-3.5" /> Advance
+                          <MoreHorizontal className="h-4 w-4" />
                         </button>
                       </td>
                     </tr>
@@ -181,6 +222,16 @@ export function Shipments() {
           </>
         )}
       </div>
+
+      {rowMenu && (
+        <DropdownMenu
+          anchor={rowMenu.anchor}
+          items={rowItems(rowMenu.row)}
+          triggerId={`shipment-menu-${rowMenu.row.orderRef}`}
+          testId={`shipment-actions-${rowMenu.row.orderRef}`}
+          onClose={() => setRowMenu(null)}
+        />
+      )}
     </div>
   );
 }

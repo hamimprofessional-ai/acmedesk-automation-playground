@@ -518,10 +518,13 @@ in-memory store for the session.
 
 ### C18-04 — Drive the order state machine
 - **Tier:** hard → any `/orders/:id`
-- **Task:** **Create shipment**, then **Advance shipment** until delivered; try **Refund**
-  and **Cancel** and observe which actions are enabled per state.
+- **Task:** **Create shipment**, then use the shipment **stage dropdown**
+  (`[shipment-stage]`) to move to the next step — only the single step after the current one
+  is enabled, everything else is blocked; try **Refund** and **Cancel** and observe which
+  actions are enabled per state.
 - **Expected:** each transition changes status badges and appends to `[shipment-timeline]`;
-  disabled actions must be respected, not clicked blindly.
+  the dropdown only permits one step forward at a time, and disabled options/actions must be
+  respected, not clicked blindly.
 
 ### C18-05 — Request a return
 - **Tier:** easy → a *delivered* `/orders/:id`
@@ -531,9 +534,11 @@ in-memory store for the session.
 
 ### C18-06 — Work the fulfillment queue
 - **Tier:** medium → `/shipments`
-- **Task:** Filter by carrier/status, then **Advance** rows through the stages.
-- **Expected:** row shipment badges progress; delivered rows disable Advance and their order
-  flips to *delivered*.
+- **Task:** Filter by carrier/status, then use each row's action menu
+  (`[shipment-menu-<ref>]`) to **Advance to next stage**, **Mark exception**, or **Reset
+  tracking**.
+- **Expected:** row shipment badges progress; the exception path is reachable; reset clears
+  the timeline and returns the order to *processing*; delivered rows only offer reset.
 
 ### C18-07 — Process an RMA
 - **Tier:** medium → `/returns`
