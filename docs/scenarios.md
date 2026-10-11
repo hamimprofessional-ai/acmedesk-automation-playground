@@ -250,6 +250,13 @@ Tiers: `easy` · `medium` · `hard`.
 - **Task:** Right-click a ticket row.
 - **Expected:** `[context-menu]` appears at the cursor with actions.
 
+### C12-03 — Row "⋮" actions dropdown
+- **Tier:** easy
+- **Task:** Hover a ticket row, click the `[row-menu-<ref>]` button, then choose "Assign to me".
+- **Expected:** `[row-actions-menu-<ref>]` appears anchored to the button; the assignee column
+  updates to "Alex Vance (me)" after the PATCH, with a success toast. "Mark as resolved" sets
+  status to *resolved*.
+
 ### C12-02 — Keyboard shortcut
 - **Tier:** medium
 - **Task:** Press `/` (not in an input).
@@ -300,6 +307,12 @@ Tiers: `easy` · `medium` · `hard`.
 
 ### AD-01 — Hover-only trigger
 - **Tier:** medium — `[open-newtab-<ref>]` and the row menu are hidden until the row is hovered.
+
+### AD-01b — Dropdown opens on hover AND on click
+- **Tier:** medium — the topbar account dropdown (`[profile-menu-trigger]` → `[profile-menu]`)
+  opens both when the avatar is **hovered** and when it is **clicked** (toggle). It closes on
+  mouse-out, outside click, or `Esc`. Tools that only dispatch `click()` without hovering, or
+  only `hover()` without clicking, must both succeed.
 
 ### AD-02 — Shadow DOM input
 - **Tier:** hard — the wizard tag input is a `<acmedesk-tag-input>` web component

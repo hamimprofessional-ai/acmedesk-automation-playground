@@ -141,6 +141,15 @@ const GROUPS: CapabilityGroup[] = [
         selector: 'data-testid="context-menu"',
         tier: 'hard',
       },
+      {
+        name: 'Row actions "⋮" dropdown',
+        page: 'Tickets',
+        to: '/tickets',
+        trigger:
+          'Hover a row → click "⋮" → pick an action (Assign to me / Mark as resolved / Duplicate / Delete)',
+        selector: 'data-testid="row-menu-<ref>" (trigger) / "row-actions-menu-<ref>" (menu)',
+        tier: 'easy',
+      },
     ],
   },
   {
@@ -293,6 +302,15 @@ const GROUPS: CapabilityGroup[] = [
         to: '/tickets',
         trigger: 'Row actions hidden until row hover',
         selector: 'data-testid="open-newtab-<ref>"',
+        tier: 'medium',
+      },
+      {
+        name: 'Dropdown that opens on hover AND click',
+        page: 'Topbar (global)',
+        to: '/',
+        trigger:
+          'Hover the "AV" avatar to open it; or click the avatar to toggle. Leave it / click outside / press Esc to close',
+        selector: 'data-testid="profile-menu-trigger" / "profile-menu"',
         tier: 'medium',
       },
       {

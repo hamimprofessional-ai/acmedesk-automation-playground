@@ -10,10 +10,12 @@ import {
   MoreHorizontal,
   LayoutGrid,
   List,
+  UserPlus,
+  CheckCircle2,
 } from 'lucide-react';
 import { apiDelete, apiGet, apiPatch, apiPost } from '@/lib/api';
 import type { Ticket, TicketStatus } from '@/mocks/data';
-import { ASSIGNEES, CATEGORIES } from '@/mocks/data';
+import { ASSIGNEES, CATEGORIES, CURRENT_USER } from '@/mocks/data';
 import type { Paginated } from '@/lib/types';
 import { downloadFile } from '@/lib/download';
 import { relativeTime } from '@/lib/format';
@@ -23,6 +25,7 @@ import { StatusBadge, PriorityBadge } from '@/components/Badges';
 import { Pagination } from '@/components/Pagination';
 import { LoadingBlock, ErrorState, EmptyState } from '@/components/States';
 import { ContextMenu, type ContextMenuItem } from '@/components/ContextMenu';
+import { DropdownMenu } from '@/components/DropdownMenu';
 import { KanbanBoard } from '@/features/tickets/KanbanBoard';
 import { SavedViews } from '@/features/tickets/SavedViews';
 
@@ -32,7 +35,8 @@ export function Tickets() {
   const [params, setParams] = useSearchParams();
   const qc = useQueryClient();
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [menu, setMenu] = useState<{ x: number; y: number; ticket: Ticket } | null>(null);
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; ticket: Ticket } | null>(null);
+  const [rowMenu, setRowMenu] = useState<{ anchor: DOMRect; ticket: Ticket } | null>(null);
 
   const q = params.get('q') ?? '';
   const statuses = params.getAll('status');
@@ -130,6 +134,15 @@ export function Tickets() {
     },
   });
 
+  const assignMutation = useMutation({
+    mutationFn: ({ id, assignee }: { id: string; assignee: string }) =>
+      apiPatch(`/api/tickets/${id}`, { assignee }),
+    onSuccess: (_d, vars) => {
+      toast.success(`Assigned to ${vars.assignee}`);
+      qc.invalidateQueries({ queryKey: ['tickets'] });
+    },
+  });
+
   async function exportCsv() {
     try {
       const name = await downloadFile(`/api/tickets/export.csv?${filterQs()}`, 'tickets.csv');
@@ -177,40 +190,58 @@ export function Tickets() {
 
   function openContext(e: React.MouseEvent, ticket: Ticket) {
     e.preventDefault();
-    setMenu({ x: e.clientX, y: e.clientY, ticket });
+    setContextMenu({ x: e.clientX, y: e.clientY, ticket });
+  }
+
+  function openDropdown(e: React.MouseEvent, ticket: Ticket) {
+    if (rowMenu?.ticket.id === ticket.id) {
+      setRowMenu(null);
+      return;
+    }
+    setRowMenu({ anchor: (e.currentTarget as HTMLElement).getBoundingClientRect(), ticket });
   }
 
   const items = data?.items ?? [];
   const allSelected = items.length > 0 && items.every((t) => selected.has(t.id));
 
-  const menuItems: ContextMenuItem[] = menu
-    ? [
-        {
-          label: 'Open in new tab',
-          icon: <ExternalLink className="h-3.5 w-3.5" />,
-          onClick: () => window.open(`/tickets/${menu.ticket.id}`, '_blank', 'noopener'),
+  function ticketItems(t: Ticket): ContextMenuItem[] {
+    return [
+      {
+        label: 'Open in new tab',
+        icon: <ExternalLink className="h-3.5 w-3.5" />,
+        onClick: () => window.open(`/tickets/${t.id}`, '_blank', 'noopener'),
+      },
+      {
+        label: 'Copy ticket link',
+        icon: <Copy className="h-3.5 w-3.5" />,
+        onClick: () => {
+          navigator.clipboard?.writeText(`${window.location.origin}/tickets/${t.id}`);
+          toast.info('Link copied to clipboard');
         },
-        {
-          label: 'Copy ticket link',
-          icon: <Copy className="h-3.5 w-3.5" />,
-          onClick: () => {
-            navigator.clipboard?.writeText(`${window.location.origin}/tickets/${menu.ticket.id}`);
-            toast.info('Link copied to clipboard');
-          },
-        },
-        {
-          label: 'Duplicate',
-          icon: <Copy className="h-3.5 w-3.5" />,
-          onClick: () => duplicateMutation.mutate(menu.ticket),
-        },
-        {
-          label: 'Delete',
-          icon: <Trash2 className="h-3.5 w-3.5" />,
-          danger: true,
-          onClick: () => confirmDelete(menu.ticket.id, menu.ticket.ref),
-        },
-      ]
-    : [];
+      },
+      {
+        label: 'Duplicate',
+        icon: <Copy className="h-3.5 w-3.5" />,
+        onClick: () => duplicateMutation.mutate(t),
+      },
+      {
+        label: 'Assign to me',
+        icon: <UserPlus className="h-3.5 w-3.5" />,
+        onClick: () => assignMutation.mutate({ id: t.id, assignee: CURRENT_USER }),
+      },
+      {
+        label: 'Mark as resolved',
+        icon: <CheckCircle2 className="h-3.5 w-3.5" />,
+        onClick: () => statusMutation.mutate({ id: t.id, status: 'resolved' }),
+      },
+      {
+        label: 'Delete',
+        icon: <Trash2 className="h-3.5 w-3.5" />,
+        danger: true,
+        onClick: () => confirmDelete(t.id, t.ref),
+      },
+    ];
+  }
 
   return (
     <div className="mx-auto max-w-7xl space-y-4">
@@ -310,6 +341,7 @@ export function Tickets() {
             onChange={(e) => setFilter('assignee', e.target.value)}
           >
             <option value="">All assignees</option>
+            <option value={CURRENT_USER}>{CURRENT_USER} (me)</option>
             {ASSIGNEES.map((a) => (
               <option key={a} value={a}>
                 {a}
@@ -473,7 +505,9 @@ export function Tickets() {
                         <button
                           type="button"
                           aria-label={`More actions for ${t.ref}`}
-                          onClick={(e) => openContext(e, t)}
+                          aria-haspopup="menu"
+                          data-testid={`row-menu-${t.ref}`}
+                          onClick={(e) => openDropdown(e, t)}
                           className="rounded-md p-1.5 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700"
                         >
                           <MoreHorizontal className="h-4 w-4" />
@@ -497,8 +531,22 @@ export function Tickets() {
         </div>
       )}
 
-      {menu && (
-        <ContextMenu x={menu.x} y={menu.y} items={menuItems} onClose={() => setMenu(null)} />
+      {contextMenu && (
+        <ContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          items={ticketItems(contextMenu.ticket)}
+          onClose={() => setContextMenu(null)}
+        />
+      )}
+      {rowMenu && (
+        <DropdownMenu
+          anchor={rowMenu.anchor}
+          items={ticketItems(rowMenu.ticket)}
+          triggerId={`row-menu-${rowMenu.ticket.ref}`}
+          testId={`row-actions-menu-${rowMenu.ticket.ref}`}
+          onClose={() => setRowMenu(null)}
+        />
       )}
     </div>
   );

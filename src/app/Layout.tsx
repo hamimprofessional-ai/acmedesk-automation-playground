@@ -12,12 +12,16 @@ import {
   Moon,
   Sun,
   Menu,
+  User,
+  LogOut,
 } from 'lucide-react';
 import { useUIStore } from '@/store/ui';
 import { LOCALES, useTranslation } from '@/lib/i18n';
 import { NotificationBell } from '@/components/NotificationBell';
 import { ConsentBanner } from '@/components/ConsentBanner';
 import { ToastHost } from '@/components/ToastHost';
+import { HoverClickDropdown } from '@/components/HoverClickDropdown';
+import { toast } from '@/store/toast';
 import { cn } from '@/lib/cn';
 
 const navItems = [
@@ -154,13 +158,39 @@ export function Layout() {
               {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
             </button>
             <NotificationBell />
-            <Link
-              to="/settings"
-              className="ms-1 flex h-8 w-8 items-center justify-center rounded-full bg-brand-600 text-xs font-semibold text-white"
-              aria-label="Your profile"
-            >
-              AV
-            </Link>
+            <HoverClickDropdown
+              testId="profile-menu"
+              ariaLabel="Account menu"
+              triggerClassName="rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+              trigger={
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-600 text-xs font-semibold text-white">
+                  AV
+                </span>
+              }
+              items={[
+                {
+                  label: 'Profile',
+                  icon: <User className="h-4 w-4" />,
+                  onSelect: () => navigate('/settings'),
+                },
+                {
+                  label: 'My tickets',
+                  icon: <TicketIcon className="h-4 w-4" />,
+                  onSelect: () => navigate('/tickets'),
+                },
+                {
+                  label: 'Preferences',
+                  icon: <SettingsIcon className="h-4 w-4" />,
+                  onSelect: () => navigate('/settings'),
+                },
+                {
+                  label: 'Sign out',
+                  icon: <LogOut className="h-4 w-4" />,
+                  danger: true,
+                  onSelect: () => toast.info('Sign out is disabled in this demo'),
+                },
+              ]}
+            />
           </div>
         </header>
 

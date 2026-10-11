@@ -84,6 +84,8 @@ export const ASSIGNEES = [
   'Aisha Khan',
   'Diego Alvarez',
 ];
+
+export const CURRENT_USER = 'Alex Vance';
 export const WAREHOUSES = ['Amsterdam', 'Rotterdam', 'Berlin', 'Utrecht'];
 export const PRODUCT_CATEGORIES = ['Accessories', 'Peripherals', 'Networking', 'Storage', 'Displays'];
 
