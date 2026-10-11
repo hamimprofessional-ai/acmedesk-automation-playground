@@ -91,7 +91,7 @@ Each capability is tied to a concrete, realistic location in the app.
 | C5 | Modals / popups (incl. nested, focus-trap, stacked) | Create/edit ticket; confirm-inside-modal; stacked dialogs |
 | C6 | Download | Export filtered table → CSV; invoice/ticket → PDF; generated report |
 | C7 | Upload | Drag-drop avatar/attachments; multi-file; type/size validation |
-| C8 | Iframes | Embedded analytics widget; third-party consent/integration panel |
+| C8 | Iframes | Real cross-origin pages (practicetestautomation.com, demoqa.com) + nested vendor iframe with 2-level postMessage |
 | C9 | Toasts / async feedback | Save actions, optimistic updates, notification polling |
 | C10 | Long lists | Paginated tables + one virtualized/infinite-scroll list |
 | C11 | Complex forms | Multi-step wizard, conditional/dynamic fields, date pickers |
@@ -142,7 +142,7 @@ Handlers cover:
 - `GET /api/reports/:id.pdf` — `application/pdf` download
 - `POST /api/uploads` — accepts `FormData`; enforces size/type rules
 - `GET /api/customers`, `/api/inventory`, `/api/notifications`
-- Static: `/embed/analytics` iframe document
+- Static: `/embed/vendor` + `/embed/vendor/status` (nested iframe documents); external iframes point to real sites (practicetestautomation.com, demoqa.com)
 
 Configuration via query/UI toggle: latency (fast/slow), failure rate,
 pagination size — deterministic per run for reproducible benchmarks.

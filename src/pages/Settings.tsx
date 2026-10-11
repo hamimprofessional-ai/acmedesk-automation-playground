@@ -10,14 +10,9 @@ export function Settings() {
   const [latency, setLatency] = useState(mockConfig.latencyMs);
   const [failureRate, setFailureRate] = useState(Math.round(mockConfig.failureRate * 100));
   const [pageSize, setPageSize] = useState(mockConfig.pageSize);
-  const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {
     const handler = (e: MessageEvent) => {
-      if (e.data?.source === 'acmedesk-consent' && e.data?.type === 'authorized') {
-        setAuthorized(true);
-        toast.success('Integration authorized');
-      }
       if (e.data?.source === 'acmedesk-vendor' && e.data?.type === 'status-refreshed') {
         toast.info(`Vendor status refreshed (in transit: ${e.data.payload?.transit})`);
       }
@@ -182,13 +177,13 @@ export function Settings() {
           <h2 className="flex items-center gap-2 text-sm font-semibold">
             <Plug className="h-4 w-4" /> Integration
           </h2>
-          {authorized && <span className="badge bg-emerald-100 text-emerald-700">authorized</span>}
+          <span className="text-xs text-slate-400">demoqa.com (external site)</span>
         </div>
         <iframe
           title="Third-party integration"
           data-testid="integration-iframe"
-          src="/embed/consent"
-          className="h-96 w-full border-t border-slate-200 dark:border-slate-700"
+          src="https://demoqa.com/"
+          className="h-96 w-full border-t border-slate-200 bg-white dark:border-slate-700"
         />
       </section>
 

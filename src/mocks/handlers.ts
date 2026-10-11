@@ -396,52 +396,6 @@ export const handlers = [
     });
   }),
 
-  // ----- Embedded analytics iframe (served as HTML) -------------------------
-  http.get('/embed/analytics', async () => {
-    await delay(200);
-    const html = `<!doctype html><html><head><meta charset="utf-8"/><style>
-      body{font-family:system-ui,sans-serif;margin:0;padding:16px;background:#0f172a;color:#e2e8f0}
-      h2{margin:0 0 12px;font-size:15px}
-      .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-      .tile{background:#1e293b;border-radius:10px;padding:14px}
-      .v{font-size:22px;font-weight:700;color:#818cf8}
-      .l{font-size:11px;text-transform:uppercase;color:#94a3b8}
-    </style></head><body>
-      <h2>Embedded Analytics</h2>
-      <div class="grid">
-        <div class="tile"><div class="v">${db.tickets.length}</div><div class="l">Tickets</div></div>
-        <div class="tile"><div class="v">${db.customers.length}</div><div class="l">Customers</div></div>
-        <div class="tile"><div class="v">${db.products.length}</div><div class="l">SKUs</div></div>
-        <div class="tile"><div class="v">${db.products.filter((p) => p.stock <= p.reorderLevel).length}</div><div class="l">Low stock</div></div>
-      </div>
-    </body></html>`;
-    return new HttpResponse(html, { headers: { 'Content-Type': 'text/html' } });
-  }),
-
-  // ----- Third-party consent / integration iframe ---------------------------
-  http.get('/embed/consent', async () => {
-    await delay(150);
-    const html = `<!doctype html><html><head><meta charset="utf-8"/><style>
-      body{font-family:system-ui,sans-serif;margin:0;padding:20px;background:#fff;color:#0f172a}
-      h2{margin:0 0 8px;font-size:16px}
-      button{background:#4f46e5;color:#fff;border:0;border-radius:8px;padding:10px 16px;cursor:pointer;font-size:14px}
-      #done{display:none;color:#16a34a;font-weight:600;margin-top:12px}
-    </style></head><body>
-      <h2>Third-party Integration</h2>
-      <p style="font-size:13px;color:#475569">Authorize AcmeDesk to sync with the warehouse provider.</p>
-      <button id="authorize" data-testid="authorize">Authorize integration</button>
-      <div id="done">✓ Integration authorized</div>
-      <script>
-        document.getElementById('authorize').addEventListener('click', function(){
-          this.style.display='none';
-          document.getElementById('done').style.display='block';
-          parent.postMessage({source:'acmedesk-consent',type:'authorized'}, '*');
-        });
-      </script>
-    </body></html>`;
-    return new HttpResponse(html, { headers: { 'Content-Type': 'text/html' } });
-  }),
-
   // ----- Nested iframe: vendor portal (level 1) embedding status widget (level 2) --
   http.get('/embed/vendor', async () => {
     await delay(180);

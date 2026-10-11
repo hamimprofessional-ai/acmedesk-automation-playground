@@ -180,18 +180,21 @@ Tiers: `easy` · `medium` · `hard`.
 
 ## C8 — Iframes
 
-### C8-01 — Read data inside an iframe
+### C8-01 — Read data inside a cross-origin iframe
 - **Tier:** medium
 - **Preconditions:** on `/`
-- **Task:** Read the "Tickets" value inside `[analytics-iframe]`.
-- **Expected:** tool must switch into the iframe context to read `#root`-independent content.
+- **Task:** Read the heading text inside `[analytics-iframe]`, which embeds the real
+  `https://practicetestautomation.com/practice-test-login/` page.
+- **Expected:** tool must switch into the cross-origin iframe context to read content that is
+  not rendered by the host app.
 
-### C8-02 — Act inside a third-party iframe
+### C8-02 — Interact with a real third-party site in an iframe
 - **Tier:** hard
 - **Preconditions:** on `/settings`
-- **Task:** Click "Authorize integration" inside `[integration-iframe]`, then observe the host page.
-- **Expected:** the iframe button hides, "authorized" badge appears on the host page
-  (via `postMessage`), plus a success toast.
+- **Task:** Inside `[integration-iframe]` (the real `https://demoqa.com/` site), expand an
+  accordion / click a menu item.
+- **Expected:** the tool switches into the cross-origin iframe context and drives the external
+  page's own DOM (no AcmeDesk selectors apply inside it).
 
 ---
 

@@ -205,10 +205,10 @@ const GROUPS: CapabilityGroup[] = [
         tier: 'medium',
       },
       {
-        name: 'Act inside a third-party iframe (postMessage to host)',
+        name: 'Interact with a real third-party site in an iframe',
         page: 'Settings',
         to: '/settings',
-        trigger: 'Integration → "Authorize integration"',
+        trigger: 'Integration panel → real demoqa.com page (forms, accordions, menus)',
         selector: 'data-testid="integration-iframe"',
         tier: 'hard',
       },
