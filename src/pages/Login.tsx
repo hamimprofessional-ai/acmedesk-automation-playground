@@ -64,7 +64,11 @@ export function Login() {
     setError('That code is not valid. Enter the code shown above.');
   }
 
-  function backToCredentials() {
+  function backToCredentials(e?: React.MouseEvent<HTMLButtonElement>) {
+    // Guard against the click's default action firing after React reuses this
+    // button node for the step-1 submit button (which would resubmit and bounce
+    // straight back to the OTP step).
+    e?.preventDefault();
     setStep(1);
     setOtp('');
     setError('');
@@ -123,7 +127,7 @@ export function Login() {
           )}
 
           {step === 1 ? (
-            <form onSubmit={submitCredentials} className="space-y-4" noValidate>
+            <form key="credentials" onSubmit={submitCredentials} className="space-y-4" noValidate>
               <div className="rounded-lg border border-dashed border-brand-300 bg-brand-50 px-3 py-2 text-xs text-brand-800 dark:border-brand-800 dark:bg-brand-950 dark:text-brand-200">
                 <p className="font-semibold uppercase tracking-wide">Test credentials</p>
                 <p className="mt-1 font-mono">
@@ -178,7 +182,7 @@ export function Login() {
               </button>
             </form>
           ) : (
-            <form onSubmit={submitOtp} className="space-y-4" noValidate>
+            <form key="otp" onSubmit={submitOtp} className="space-y-4" noValidate>
               <div className="rounded-lg border border-dashed border-brand-300 bg-brand-50 px-3 py-2 text-xs text-brand-800 dark:border-brand-800 dark:bg-brand-950 dark:text-brand-200">
                 <p className="font-semibold uppercase tracking-wide">Test one-time code</p>
                 <p className="mt-1 font-mono">

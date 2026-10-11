@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { useUIStore } from '@/store/ui';
 import { initialsOf, useAuthStore } from '@/store/auth';
+import { CURRENT_USER } from '@/mocks/data';
 import { LOCALES, useTranslation } from '@/lib/i18n';
 import { NotificationBell } from '@/components/NotificationBell';
 import { ConsentBanner } from '@/components/ConsentBanner';
@@ -208,22 +209,22 @@ export function Layout() {
             <HoverClickDropdown
               testId="profile-menu"
               ariaLabel="Account menu"
-              triggerClassName="rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+              triggerClassName="rounded-full px-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
               trigger={
                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-600 text-xs font-semibold text-white">
-                  {user ? initialsOf(user.username) : 'AV'}
+                  {user ? initialsOf(user.name || user.username) : 'AV'}
                 </span>
               }
               items={[
                 {
-                  label: user?.username ?? 'Account',
+                  label: 'Profile',
                   icon: <User className="h-4 w-4" />,
-                  onSelect: () => navigate('/settings'),
+                  onSelect: () => navigate('/profile'),
                 },
                 {
                   label: 'My tickets',
                   icon: <TicketIcon className="h-4 w-4" />,
-                  onSelect: () => navigate('/tickets'),
+                  onSelect: () => navigate(`/tickets?assignee=${encodeURIComponent(CURRENT_USER)}`),
                 },
                 {
                   label: 'Preferences',

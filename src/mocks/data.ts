@@ -201,6 +201,12 @@ export const comments: Comment[] = tickets.slice(0, 40).flatMap((t) =>
   })),
 );
 
+// Give the signed-in user a stable slice of tickets so the "My tickets" view
+// (tickets?assignee=CURRENT_USER) always has content to practise against.
+tickets.forEach((t, i) => {
+  if (i % 6 === 0) t.assignee = CURRENT_USER;
+});
+
 export const ticketCounts = {
   total: tickets.length,
   byStatus: tickets.reduce<Record<string, number>>((acc, t) => {

@@ -20,12 +20,32 @@ export function checkOtp(code: string): boolean {
 
 export interface AuthUser {
   username: string;
+  name: string;
+  email: string;
+  phone: string;
+  jobTitle: string;
+  department: string;
+  location: string;
+  bio: string;
 }
+
+export type ProfileFields = Omit<AuthUser, 'username'>;
+
+const EMPTY_PROFILE: ProfileFields = {
+  name: '',
+  email: '',
+  phone: '',
+  jobTitle: '',
+  department: '',
+  location: '',
+  bio: '',
+};
 
 interface AuthState {
   user: AuthUser | null;
   isAuthenticated: boolean;
   signIn: (username: string) => void;
+  updateProfile: (patch: Partial<ProfileFields>) => void;
   signOut: () => void;
 }
 
@@ -34,10 +54,26 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       user: null,
       isAuthenticated: false,
-      signIn: (username) => set({ user: { username }, isAuthenticated: true }),
+      signIn: (username) =>
+        set({ user: { username, ...EMPTY_PROFILE }, isAuthenticated: true }),
+      updateProfile: (patch) =>
+        set((s) => (s.user ? { user: { ...s.user, ...patch } } : {})),
       signOut: () => set({ user: null, isAuthenticated: false }),
     }),
-    { name: 'acmedesk-auth' },
+    {
+      name: 'acmedesk-auth',
+      version: 2,
+      migrate: (persisted) => {
+        const state = (persisted ?? {}) as {
+          user?: Partial<AuthUser> | null;
+          isAuthenticated?: boolean;
+        };
+        if (state.user) {
+          state.user = { ...EMPTY_PROFILE, ...state.user };
+        }
+        return state as AuthState;
+      },
+    },
   ),
 );
 

@@ -17,6 +17,7 @@ import { Shipments } from '@/pages/Shipments';
 import { Returns } from '@/pages/Returns';
 import { Reports } from '@/pages/Reports';
 import { Settings } from '@/pages/Settings';
+import { Profile } from '@/pages/Profile';
 import { Capabilities } from '@/pages/Capabilities';
 import { ChallengeHub } from '@/pages/ChallengeHub';
 import { ChallengeDetail } from '@/pages/ChallengeDetail';
@@ -61,6 +62,7 @@ export default function App() {
             <Route path="/returns" element={<Returns />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/capabilities" element={<Capabilities />} />
             <Route path="/challenges" element={<ChallengeHub />} />
             <Route path="/challenges/:slug" element={<ChallengeDetail />} />
