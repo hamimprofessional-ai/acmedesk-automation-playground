@@ -20,13 +20,13 @@ import {
   LogOut,
 } from 'lucide-react';
 import { useUIStore } from '@/store/ui';
+import { initialsOf, useAuthStore } from '@/store/auth';
 import { LOCALES, useTranslation } from '@/lib/i18n';
 import { NotificationBell } from '@/components/NotificationBell';
 import { ConsentBanner } from '@/components/ConsentBanner';
 import { ToastHost } from '@/components/ToastHost';
 import { HoverClickDropdown } from '@/components/HoverClickDropdown';
 import { Tooltip } from '@/components/Tooltip';
-import { toast } from '@/store/toast';
 import { cn } from '@/lib/cn';
 import { useMediaQuery } from '@/lib/useMediaQuery';
 
@@ -47,6 +47,8 @@ const navItems = [
 export function Layout() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const user = useAuthStore((s) => s.user);
+  const signOut = useAuthStore((s) => s.signOut);
   const theme = useUIStore((s) => s.theme);
   const toggleTheme = useUIStore((s) => s.toggleTheme);
   const locale = useUIStore((s) => s.locale);
@@ -209,12 +211,12 @@ export function Layout() {
               triggerClassName="rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
               trigger={
                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-600 text-xs font-semibold text-white">
-                  AV
+                  {user ? initialsOf(user.username) : 'AV'}
                 </span>
               }
               items={[
                 {
-                  label: 'Profile',
+                  label: user?.username ?? 'Account',
                   icon: <User className="h-4 w-4" />,
                   onSelect: () => navigate('/settings'),
                 },
@@ -232,7 +234,10 @@ export function Layout() {
                   label: 'Sign out',
                   icon: <LogOut className="h-4 w-4" />,
                   danger: true,
-                  onSelect: () => toast.info('Sign out is disabled in this demo'),
+                  onSelect: () => {
+                    signOut();
+                    navigate('/login', { replace: true });
+                  },
                 },
               ]}
             />

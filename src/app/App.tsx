@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { Layout } from './Layout';
+import { RequireAuth } from './RequireAuth';
+import { Login } from '@/pages/Login';
 import { Dashboard } from '@/pages/Dashboard';
 import { Tickets } from '@/pages/Tickets';
 import { TicketDetail } from '@/pages/TicketDetail';
@@ -42,29 +44,32 @@ export default function App() {
     <>
       <ScrollToTop />
       <Routes>
-        <Route element={<Layout />}>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/tickets" element={<Tickets />} />
-          <Route path="/tickets/new" element={<NewTicketWizard />} />
-          <Route path="/tickets/:id" element={<TicketDetail />} />
-          <Route path="/customers" element={<Customers />} />
-          <Route path="/customers/:id" element={<CustomerDetail />} />
-          <Route path="/inventory" element={<Inventory />} />
-          <Route path="/orders" element={<Orders />} />
-          <Route path="/orders/new" element={<NewOrder />} />
-          <Route path="/orders/:id" element={<OrderDetail />} />
-          <Route path="/shipments" element={<Shipments />} />
-          <Route path="/returns" element={<Returns />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/capabilities" element={<Capabilities />} />
-          <Route path="/challenges" element={<ChallengeHub />} />
-          <Route path="/challenges/:slug" element={<ChallengeDetail />} />
-          <Route path="/404" element={<NotFound />} />
-          <Route path="*" element={<Navigate to="/404" replace />} />
+        <Route path="/login" element={<Login />} />
+        <Route element={<RequireAuth />}>
+          <Route element={<Layout />}>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/tickets" element={<Tickets />} />
+            <Route path="/tickets/new" element={<NewTicketWizard />} />
+            <Route path="/tickets/:id" element={<TicketDetail />} />
+            <Route path="/customers" element={<Customers />} />
+            <Route path="/customers/:id" element={<CustomerDetail />} />
+            <Route path="/inventory" element={<Inventory />} />
+            <Route path="/orders" element={<Orders />} />
+            <Route path="/orders/new" element={<NewOrder />} />
+            <Route path="/orders/:id" element={<OrderDetail />} />
+            <Route path="/shipments" element={<Shipments />} />
+            <Route path="/returns" element={<Returns />} />
+            <Route path="/reports" element={<Reports />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/capabilities" element={<Capabilities />} />
+            <Route path="/challenges" element={<ChallengeHub />} />
+            <Route path="/challenges/:slug" element={<ChallengeDetail />} />
+            <Route path="/404" element={<NotFound />} />
+            <Route path="*" element={<Navigate to="/404" replace />} />
+          </Route>
+          {/* Routes rendered outside the main chrome (opened in new window/tab) */}
+          <Route path="/popout/widget" element={<PopoutWidget />} />
         </Route>
-        {/* Routes rendered outside the main chrome (opened in new window/tab) */}
-        <Route path="/popout/widget" element={<PopoutWidget />} />
       </Routes>
     </>
   );
