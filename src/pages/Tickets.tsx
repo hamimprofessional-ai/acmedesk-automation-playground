@@ -26,6 +26,7 @@ import { Pagination } from '@/components/Pagination';
 import { LoadingBlock, ErrorState, EmptyState } from '@/components/States';
 import { ContextMenu, type ContextMenuItem } from '@/components/ContextMenu';
 import { DropdownMenu } from '@/components/DropdownMenu';
+import { Tooltip } from '@/components/Tooltip';
 import { Modal } from '@/components/Modal';
 import { KanbanBoard } from '@/features/tickets/KanbanBoard';
 import { SavedViews } from '@/features/tickets/SavedViews';
@@ -497,26 +498,30 @@ export function Tickets() {
                     <td className="px-3 py-2.5 text-slate-500">{relativeTime(t.updatedAt)}</td>
                     <td className="px-3 py-2.5">
                       <div className="flex items-center justify-end gap-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
-                        <a
-                          href={`/tickets/${t.id}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          data-testid={`open-newtab-${t.ref}`}
-                          aria-label={`Open ${t.ref} in new tab`}
-                          className="rounded-md p-1.5 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700"
-                        >
-                          <ExternalLink className="h-4 w-4" />
-                        </a>
-                        <button
-                          type="button"
-                          aria-label={`More actions for ${t.ref}`}
-                          aria-haspopup="menu"
-                          data-testid={`row-menu-${t.ref}`}
-                          onClick={(e) => openDropdown(e, t)}
-                          className="rounded-md p-1.5 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700"
-                        >
-                          <MoreHorizontal className="h-4 w-4" />
-                        </button>
+                        <Tooltip label="Open in new tab" testId={`tooltip-newtab-${t.ref}`}>
+                          <a
+                            href={`/tickets/${t.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            data-testid={`open-newtab-${t.ref}`}
+                            aria-label={`Open ${t.ref} in new tab`}
+                            className="rounded-md p-1.5 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </a>
+                        </Tooltip>
+                        <Tooltip label="More actions" testId={`tooltip-more-${t.ref}`}>
+                          <button
+                            type="button"
+                            aria-label={`More actions for ${t.ref}`}
+                            aria-haspopup="menu"
+                            data-testid={`row-menu-${t.ref}`}
+                            onClick={(e) => openDropdown(e, t)}
+                            className="rounded-md p-1.5 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700"
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                          </button>
+                        </Tooltip>
                       </div>
                     </td>
                   </tr>

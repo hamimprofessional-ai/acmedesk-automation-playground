@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Save, Palette, Globe, Gauge, Plug, Truck } from 'lucide-react';
-import { useUIStore, type Density, type Theme } from '@/store/ui';
+import { Save, Palette, Globe, Gauge, Plug, Truck, HelpCircle, PanelLeft } from 'lucide-react';
+import { useUIStore, type Density, type Theme, type SidebarMode } from '@/store/ui';
 import { LOCALES } from '@/lib/i18n';
 import { mockConfig } from '@/mocks/config';
 import { toast } from '@/store/toast';
+import { Accordion } from '@/components/Accordion';
 
 export function Settings() {
-  const { theme, setTheme, locale, setLocale, density, setDensity } = useUIStore();
+  const { theme, setTheme, locale, setLocale, density, setDensity, sidebarMode, setSidebarMode } =
+    useUIStore();
   const [latency, setLatency] = useState(mockConfig.latencyMs);
   const [failureRate, setFailureRate] = useState(Math.round(mockConfig.failureRate * 100));
   const [pageSize, setPageSize] = useState(mockConfig.pageSize);
@@ -38,6 +40,47 @@ export function Settings() {
       <h1 className="text-xl font-semibold" data-testid="page-title">
         Settings
       </h1>
+
+      <section className="card p-5">
+        <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold">
+          <HelpCircle className="h-4 w-4" /> Help &amp; FAQ
+        </h2>
+        <Accordion
+          testId="settings-accordion"
+          items={[
+            {
+              id: 'sla',
+              title: 'How are response SLAs calculated?',
+              content: (
+                <p>
+                  SLAs are based on priority: urgent = 1h, high = 4h, medium = 24h, low = 72h.
+                  Breaching tickets are highlighted in the ticket list.
+                </p>
+              ),
+            },
+            {
+              id: 'export',
+              title: 'What data is included in a CSV export?',
+              content: (
+                <p>
+                  The export honours the active filters and columns: Ref, Subject, Status,
+                  Priority, Category, Customer, Assignee and last updated date.
+                </p>
+              ),
+            },
+            {
+              id: 'integrations',
+              title: 'Which integrations are available?',
+              content: (
+                <p>
+                  The warehouse provider (demoqa.com) and the ParcelPal vendor portal are embedded
+                  here. Vendors sync stock and shipment status every 15 minutes.
+                </p>
+              ),
+            },
+          ]}
+        />
+      </section>
 
       <section className="card p-5">
         <h2 className="mb-4 flex items-center gap-2 text-sm font-semibold">
@@ -107,6 +150,50 @@ export function Settings() {
         </p>
         <div className="mt-4 flex justify-end">
           <button type="button" className="btn-primary" data-testid="save-language" onClick={() => toast.success('Language saved')}>
+            <Save className="h-4 w-4" /> Save
+          </button>
+        </div>
+      </section>
+
+      <section className="card p-5">
+        <h2 className="mb-4 flex items-center gap-2 text-sm font-semibold">
+          <PanelLeft className="h-4 w-4" /> Navigation
+        </h2>
+        <fieldset data-testid="settings-sidebar-mode">
+          <legend className="label">Sidebar (desktop)</legend>
+          <div className="mt-1 space-y-2">
+            {(
+              [
+                { value: 'pinned', label: 'Always open (pinned)', desc: 'Docked and always visible on desktop.' },
+                { value: 'drawer', label: 'Collapsed (drawer)', desc: 'Hidden until opened from the ☰ button.' },
+              ] as { value: SidebarMode; label: string; desc: string }[]
+            ).map((opt) => (
+              <label key={opt.value} className="flex cursor-pointer items-start gap-3">
+                <input
+                  type="radio"
+                  name="sidebar-mode"
+                  value={opt.value}
+                  checked={sidebarMode === opt.value}
+                  onChange={() => setSidebarMode(opt.value)}
+                  data-testid={`settings-sidebar-mode-${opt.value}`}
+                  className="mt-0.5 h-4 w-4 accent-brand-600"
+                />
+                <span>
+                  <span className="block text-sm font-medium text-slate-700 dark:text-slate-200">
+                    {opt.label}
+                  </span>
+                  <span className="block text-xs text-slate-400">{opt.desc}</span>
+                </span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+        <p className="mt-3 text-xs text-slate-400">
+          On desktop, keep the sidebar docked open, or collapse it into a drawer opened from the ☰
+          button. Mobile always uses the drawer.
+        </p>
+        <div className="mt-4 flex justify-end">
+          <button type="button" className="btn-primary" data-testid="save-navigation" onClick={() => toast.success('Navigation saved')}>
             <Save className="h-4 w-4" /> Save
           </button>
         </div>
