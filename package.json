@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "AcmeDesk - Customer Operations Console (web capability benchmark harness)",
+  "description": "AcmeDesk - a Customer Operations Console for practicing AI test automation",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",

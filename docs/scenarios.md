@@ -1,6 +1,6 @@
-# AcmeDesk — Benchmark Scenario Catalog
+# AcmeDesk — Practice Scenario Catalog
 
-Task catalog for benchmarking an AI test-automation tool. Each scenario lists the
+Task catalog for practicing AI test automation. Each scenario lists the
 capability, difficulty tier, preconditions, the task, and the expected outcome.
 
 **How to run:** `npm install` then `npm run dev` (http://localhost:4040). The mock
@@ -27,7 +27,7 @@ Tiers: `easy` · `medium` · `hard`.
 | C6 Download | C6-01 … C6-04 |
 | C7 Upload | C7-01 … C7-03 |
 | C8 Iframes | C8-01, C8-02 |
-| C9 Toasts / async | C9-01, C9-02 |
+| C9 Toasts / async | C9-01 … C9-03 |
 | C10 Long / virtualized lists | C10-01, C10-02 |
 | C11 Wizard / forms | C11-01, C11-02 |
 | C12 Context menu / keyboard | C12-01, C12-02 |
@@ -214,6 +214,14 @@ Tiers: `easy` · `medium` · `hard`.
 - **Task:** Navigate to `/tickets`.
 - **Expected:** a loading indicator shows; the tool must wait for rows rather than fail fast.
 
+### C9-03 — Wait for the random data loader
+- **Tier:** medium
+- **Preconditions:** open `/customers` (or the Dashboard "Pop out widget" window).
+- **Task:** Wait for the data to populate.
+- **Expected:** the table / widget area shows `[data-loader]` for a **non-deterministic 5–10s**
+  (a progress bar fills over that time) before content appears; the tool must not time out or
+  assert before the loader disappears. The duration differs on each visit.
+
 ---
 
 ## C10 — Long / virtualized lists
@@ -273,7 +281,7 @@ Tiers: `easy` · `medium` · `hard`.
 - **Tier:** medium
 - **Task:** On `/tickets/:id` click the copy icon next to `[ticket-ref]`.
 - **Expected:** clipboard contains the ref; info toast.
-- **Note:** clipboard read requires browser permission (test harness must grant it).
+- **Note:** clipboard read requires browser permission (your automation tool must grant it).
 
 ### C13-02 — Print
 - **Tier:** medium
@@ -401,9 +409,10 @@ Tiers: `easy` · `medium` · `hard`.
 
 ---
 
-## Suggested scoring
+## How to score your practice
 
 - Base points by tier: easy = 1, medium = 2, hard = 3.
 - Award only if the **expected outcome is verified**, not merely if a click occurred.
-- Track per-capability pass rate to surface which browser capabilities the tool handles
-  weakly (e.g. native dialogs, windows vs tabs, shadow DOM, iframe context switching).
+- Track per-capability pass rate to see which browser capabilities you (or your
+  automation) handle weakly (e.g. native dialogs, windows vs tabs, shadow DOM, iframe
+  context switching).

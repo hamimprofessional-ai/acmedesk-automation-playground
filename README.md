@@ -1,13 +1,13 @@
-# AcmeDesk — Web Capability Benchmark Harness
+# AcmeDesk — Test Automation Practice Site
 
-> A realistic, full-featured web application used to **benchmark an AI test-automation
-> tool** against the entire surface of real browser capabilities — tabs, windows,
-> native dialogs, downloads, uploads, iframes, navigation, async state, and a layer
-> of adversarial edge cases.
+> A realistic, full-featured web application built to help people learning AI test
+> automation practice against the entire surface of real browser capabilities — tabs,
+> windows, native dialogs, downloads, uploads, iframes, navigation, async state, and a
+> layer of deliberately tricky edge cases.
 
 AcmeDesk looks and behaves like an internal back-office product. Capabilities aren't
-exposed as a page of buttons — they're **hidden inside believable workflows**, so a
-tool has to *discover* triggers the way it would on a real site.
+exposed as a page of buttons — they're **hidden inside believable workflows**, so you
+have to *discover* triggers the way you would on a real site.
 
 ---
 
@@ -22,7 +22,7 @@ tool has to *discover* triggers the way it would on a real site.
 - [Local development](#local-development)
 - [Configuration](#configuration)
 - [Project structure](#project-structure)
-- [Benchmark documentation](#benchmark-documentation)
+- [Further documentation](#further-documentation)
 - [Deployment](#deployment)
 - [Known behaviors / caveats](#known-behaviors--caveats)
 
@@ -40,20 +40,21 @@ tool has to *discover* triggers the way it would on a real site.
 - **Settings** — appearance, locale, navigation, integrations, and backend simulation
 - **Capabilities** — a self-documenting catalog of every testable behavior in the app
 
-It is **not** a real product. It exists purely to be *automated against*. There is no
+It is **not** a real product. It's a hands-on practice playground: there is no
 authentication, no server, and no real data — everything runs in the browser.
 
 ---
 
 ## Who is it for?
 
-- **Engineers evaluating AI test-automation / browser agents.** Point the tool at the
-  site and score how many benchmark scenarios it completes across difficulty tiers.
-- **QA / test-tool developers** who need a stable, deterministic site that exercises
-  the *hard* parts of web automation (iframes, shadow DOM, hover-only triggers,
-  races, early-dismissing toasts) instead of trivial static pages.
-- **Anyone learning browser automation** who wants a safe sandbox with documented,
-  reproducible tasks in [`docs/scenarios.md`](docs/scenarios.md).
+- **AI automation & test-automation learners** who want a realistic site to practice
+  on, with documented, reproducible tasks that get harder as you go.
+- **Anyone practicing browser automation** — Playwright, Selenium, Cypress, or an AI
+  agent — where the interesting parts are the *hard* cases: iframes, shadow DOM,
+  hover-only triggers, races, and early-dismissing toasts, not trivial static pages.
+- **Instructors and study groups** who need a stable, deterministic site that everyone
+  sees the same way, backed by a documented task list in
+  [`docs/scenarios.md`](docs/scenarios.md).
 
 ---
 
@@ -76,7 +77,7 @@ authentication, no server, and no real data — everything runs in the browser.
 
 The in-app **Capabilities** page (`/capabilities`) documents every capability with a
 page, a "how to trigger" hint, and a `data-testid` selector hint where relevant. The
-same information is broken into **scored tasks** in
+same information is broken into **guided practice tasks** in
 [`docs/scenarios.md`](docs/scenarios.md).
 
 | Area | Examples (tiered easy → hard) |
@@ -189,7 +190,7 @@ switches the document to RTL). Preferences persist in `localStorage`.
 ```
 practice-demo-site/
 ├─ docs/
-│  ├─ benchmark-spec.md      # design goals, principles, decisions log
+│  ├─ design-spec.md         # design goals, principles, decisions log
 │  └─ scenarios.md           # capability → task → expected-outcome catalog
 ├─ public/
 │  ├─ mockServiceWorker.js   # MSW worker (served at /)
@@ -210,16 +211,16 @@ practice-demo-site/
 
 ---
 
-## Benchmark documentation
+## Further documentation
 
-- [`docs/benchmark-spec.md`](docs/benchmark-spec.md) — the *why*: goals, principles,
+- [`docs/design-spec.md`](docs/design-spec.md) — the *why*: goals, principles,
   product concept, tech choices, edge-case layer, mock API, and decisions log.
-- [`docs/scenarios.md`](docs/scenarios.md) — the *what*: a catalog of concrete,
-  scored tasks (`C1`…`C16`, plus adversarial `AD-01`…), each with tier,
-  preconditions, task, and expected outcome.
+- [`docs/scenarios.md`](docs/scenarios.md) — the *what*: a catalog of concrete
+  practice tasks (`C1`…`C16`, plus adversarial `AD-01`…), each with a difficulty
+  tier, preconditions, task, and expected outcome.
 
-Start with the **Capabilities** page in-app for a human-friendly overview, then use
-`docs/scenarios.md` as the machine-gradable task list.
+Start with the **Capabilities** page in-app for a friendly overview, then work through
+`docs/scenarios.md` as your practice checklist.
 
 ---
 
@@ -237,6 +238,10 @@ The app is a static SPA and is deployed on **Cloudflare Pages**.
 
 ## Known behaviors / caveats
 
+- **Random data loader.** Opening `/customers` (or the Dashboard "Pop out widget"
+  window) shows a `[data-loader]` for a **random 5–10 seconds**
+  (`data-testid="data-loader"`) before content appears — intentionally non-deterministic,
+  to practice waiting for real-world loading screens.
 - **MSW registers at page load.** After changing any file in `src/mocks/`, do a hard
   refresh (`Ctrl+Shift+R`) so the new handlers take effect.
 - **No backend.** Refreshing resets all in-memory mock data to its deterministic seed.

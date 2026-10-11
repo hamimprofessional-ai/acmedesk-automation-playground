@@ -1,16 +1,16 @@
-# AcmeDesk — Web Capability Benchmark Harness
+# AcmeDesk — Design Spec
 
-> A realistic, complex web application used to benchmark an AI test-automation
-> tool against the full surface of browser capabilities (tabs, windows, dialogs,
-> navigation, files, iframes, async state, and adversarial edge cases).
+> A realistic, complex web application built to help people learning AI test
+> automation practice the full surface of browser capabilities (tabs, windows,
+> dialogs, navigation, files, iframes, async state, and adversarial edge cases).
 
 ---
 
 ## 1. Goal & principles
 
 Build a **believable product** — not a page of buttons — where every browser
-capability appears **inside a natural workflow**. The AI tool must discover
-triggers the way it would on a real site.
+capability appears **inside a natural workflow**. You must discover
+triggers the way you would on a real site.
 
 Design principles:
 
@@ -20,7 +20,7 @@ Design principles:
 2. **Deterministic & reproducible.** Fixed seed data; no randomness at read
    time. Mock latency/errors are configurable but deterministic per run.
 3. **Tiered difficulty.** Each capability can be presented at easy / medium /
-   hard, so one capability yields a graded benchmark score.
+   hard, so a single capability can be practiced at several difficulty levels.
 4. **Real browser behavior.** Real history navigation, real `window.open`,
    real `Content-Disposition` downloads, real `FormData` uploads — via MSW so
    no backend infra is required.
@@ -63,7 +63,7 @@ No authentication in v1.
 ```
 practice-demo-site/
 ├─ docs/
-│  └─ benchmark-spec.md          # this file
+│  ├─ design-spec.md             # this file
 │  └─ scenarios.md               # capability → task → expected outcome catalog
 ├─ src/
 │  ├─ app/                       # router, layout, providers
@@ -107,8 +107,8 @@ Excluded from v1 (future): auth, roles, session expiry, payments.
 
 ## 6. Adversarial / edge-case layer
 
-Deliberately included so the benchmark exposes real tool weaknesses. Marked
-with a difficulty tier.
+Deliberately included so learners run into the tricky parts of real-world
+automation. Marked with a difficulty tier.
 
 | Edge case | Tier | Example |
 |---|---|---|
@@ -127,8 +127,8 @@ with a difficulty tier.
 | RTL / non-Latin text | medium | Locale toggle to an RTL language |
 | Toast stacking / ordering | low | Multiple sequential toasts |
 
-Tiers map to benchmark scoring: a tool that only completes `easy` earns a
-lower score than one clearing `hard`.
+Tiers map to practice difficulty: clearing the `hard` cases is a bigger milestone
+than the `easy` ones.
 
 ---
 
@@ -146,13 +146,13 @@ Handlers cover:
 - Static: `/embed/vendor` + `/embed/vendor/status` (nested iframe documents); external iframes point to real sites (practicetestautomation.com, demoqa.com)
 
 Configuration via query/UI toggle: latency (fast/slow), failure rate,
-pagination size — deterministic per run for reproducible benchmarks.
+pagination size — deterministic per run for reproducible practice.
 
 ---
 
 ## 8. Scenario catalog format (`docs/scenarios.md`)
 
-Each benchmark task is documented as:
+Each practice task is documented as:
 
 ```
 ID: C6-download-02
@@ -177,7 +177,7 @@ Adversarial note: export button sits under a sticky table header (needs scroll)
 4. **Adversarial layer** — shadow DOM, virtualization, hover/occlusion,
    delayed/fast elements, races.
 5. **Locale/theme + polish** — C12, C13, C14, C15.
-6. **Scenario catalog** — complete `docs/scenarios.md` (the benchmark input).
+6. **Scenario catalog** — complete `docs/scenarios.md` (the practice task list).
 
 ---
 
@@ -185,7 +185,7 @@ Adversarial note: export button sits under a sticky table header (needs scroll)
 
 | Decision | Choice |
 |---|---|
-| Verification model | Realistic interaction only — no server-side event log / scoring API |
+| Verification model | Realistic interaction only — no server-side event log / hidden tracking |
 | Auth | Out of scope for v1 |
 | Domain | Customer Operations Console (tickets, customers, inventory, reports) |
 | Scope of v1 | Capability-first MVP, then expand |

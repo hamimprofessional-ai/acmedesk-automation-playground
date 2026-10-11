@@ -6,7 +6,8 @@ import { apiGet } from '@/lib/api';
 import type { Customer } from '@/mocks/data';
 import type { Paginated } from '@/lib/types';
 import { PlanBadge } from '@/components/Badges';
-import { LoadingBlock, ErrorState, EmptyState } from '@/components/States';
+import { ErrorState, EmptyState } from '@/components/States';
+import { DataLoaderScreen, useRandomLoadDelay } from '@/components/DataLoader';
 import { VirtualList } from '@/components/VirtualList';
 import { formatDate } from '@/lib/format';
 
@@ -15,6 +16,8 @@ export function Customers() {
   const [plan, setPlan] = useState('');
   const [status, setStatus] = useState('');
 
+  const { ready, duration } = useRandomLoadDelay();
+
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['customers', { q, plan, status }],
     queryFn: () =>
@@ -22,6 +25,7 @@ export function Customers() {
   });
 
   const items = data?.items ?? [];
+  const loading = isLoading || !ready;
 
   return (
     <div className="mx-auto max-w-6xl space-y-4">
@@ -69,8 +73,13 @@ export function Customers() {
           <span>Since</span>
           <span className="sr-only">Actions</span>
         </div>
-        {isLoading ? (
-          <LoadingBlock />
+        {loading ? (
+          <DataLoaderScreen
+            duration={duration}
+            label="Loading customers…"
+            hint="Preparing your customer data. This may take a few seconds."
+            className="min-h-[420px]"
+          />
         ) : isError ? (
           <ErrorState message={(error as Error).message} onRetry={() => refetch()} />
         ) : items.length === 0 ? (

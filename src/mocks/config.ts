@@ -1,5 +1,5 @@
-// Runtime-mutable mock backend configuration. Adjustable from Settings so the
-// benchmark can exercise slow/failing network conditions deterministically.
+// Runtime-mutable mock backend configuration. Adjustable from Settings so you can
+// practice slow/failing network conditions deterministically.
 export const mockConfig = {
   latencyMs: 250,
   failureRate: 0,

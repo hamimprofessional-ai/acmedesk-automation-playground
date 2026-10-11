@@ -235,6 +235,14 @@ const GROUPS: CapabilityGroup[] = [
     title: 'Async & lists',
     items: [
       {
+        name: 'Data loader (random 5–10s)',
+        page: 'Customers / Pop-out widget',
+        to: '/customers',
+        trigger: 'Open Customers, or the Dashboard "Pop out widget" window — the loader shows for a random 5–10s before data appears',
+        selector: 'data-testid="data-loader"',
+        tier: 'medium',
+      },
+      {
         name: 'Toast notifications (auto-dismiss)',
         page: 'Global',
         to: '/',
@@ -286,7 +294,7 @@ const GROUPS: CapabilityGroup[] = [
   },
   {
     title: 'Advanced DOM & edge cases',
-    note: 'These deliberately exercise tricky selectors and later a benchmark tier.',
+    note: 'These deliberately exercise tricky selectors and edge cases.',
     items: [
       {
         name: 'Shadow DOM input (web component)',
@@ -500,7 +508,7 @@ export function Capabilities() {
         <span className="badge bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">easy</span>
         <span className="badge bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300">medium</span>
         <span className="badge bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">hard</span>
-        <span className="ms-2 text-xs text-slate-400">Difficulty tier for benchmark scoring</span>
+        <span className="ms-2 text-xs text-slate-400">Difficulty tier</span>
       </div>
 
       {filtered.map((group) => (

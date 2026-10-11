@@ -135,7 +135,7 @@ export function Layout() {
           ))}
         </nav>
         <div className="border-t border-slate-200 px-5 py-4 text-xs text-slate-400 dark:border-slate-800">
-          v1.0 · benchmark harness
+          v1.0 · test automation practice site
         </div>
       </aside>
 

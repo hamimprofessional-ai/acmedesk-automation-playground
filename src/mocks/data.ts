@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 
-// Deterministic seed so benchmark runs are reproducible.
+// Deterministic seed so practice runs are reproducible.
 faker.seed(20241011);
 
 export type TicketStatus = 'open' | 'pending' | 'resolved' | 'closed';
