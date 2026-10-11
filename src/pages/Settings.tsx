@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Save, Palette, Globe, Gauge, Plug } from 'lucide-react';
+import { Save, Palette, Globe, Gauge, Plug, Truck } from 'lucide-react';
 import { useUIStore, type Density, type Theme } from '@/store/ui';
 import { LOCALES } from '@/lib/i18n';
 import { mockConfig } from '@/mocks/config';
@@ -17,6 +17,9 @@ export function Settings() {
       if (e.data?.source === 'acmedesk-consent' && e.data?.type === 'authorized') {
         setAuthorized(true);
         toast.success('Integration authorized');
+      }
+      if (e.data?.source === 'acmedesk-vendor' && e.data?.type === 'status-refreshed') {
+        toast.info(`Vendor status refreshed (in transit: ${e.data.payload?.transit})`);
       }
     };
     window.addEventListener('message', handler);
@@ -185,8 +188,28 @@ export function Settings() {
           title="Third-party integration"
           data-testid="integration-iframe"
           src="/embed/consent"
-          className="h-48 w-full border-t border-slate-200 dark:border-slate-700"
+          className="h-96 w-full border-t border-slate-200 dark:border-slate-700"
         />
+      </section>
+
+      <section className="card overflow-hidden">
+        <div className="flex items-center justify-between p-5 pb-3">
+          <h2 className="flex items-center gap-2 text-sm font-semibold">
+            <Truck className="h-4 w-4" /> Vendor portal
+          </h2>
+          <span className="text-xs text-slate-400">nested iframe</span>
+        </div>
+        <iframe
+          title="ParcelPal vendor portal"
+          data-testid="vendor-iframe"
+          src="/embed/vendor"
+          className="h-[32rem] w-full border-t border-slate-200 bg-slate-100 dark:border-slate-700"
+        />
+        <p className="bg-slate-50 px-5 py-2.5 text-xs text-slate-500 dark:bg-slate-800/60 dark:text-slate-400">
+          The portal (level 1) embeds a status widget (level 2). Clicking{" "}
+          <code className="rounded bg-slate-200 px-1 dark:bg-slate-700">Refresh status</code> inside
+          the innermost frame relays a message through both iframe levels to this page.
+        </p>
       </section>
     </div>
   );

@@ -441,4 +441,58 @@ export const handlers = [
     </body></html>`;
     return new HttpResponse(html, { headers: { 'Content-Type': 'text/html' } });
   }),
+
+  // ----- Nested iframe: vendor portal (level 1) embedding status widget (level 2) --
+  http.get('/embed/vendor', async () => {
+    await delay(180);
+    const html = `<!doctype html><html><head><meta charset="utf-8"/><style>
+      body{font-family:system-ui,sans-serif;margin:0;padding:16px;background:#f8fafc;color:#0f172a}
+      h2{margin:0 0 4px;font-size:15px}
+      .sub{font-size:12px;color:#64748b;margin-bottom:12px}
+      .lvl{display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#6366f1;background:#e0e7ff;border-radius:999px;padding:2px 8px;margin-bottom:10px}
+      .frame{border:1px solid #cbd5e1;border-radius:10px;overflow:hidden;background:#fff}
+      iframe{display:block;width:100%;height:230px;border:0}
+    </style></head><body>
+      <span class="lvl">level 1 iframe</span>
+      <h2>ParcelPal — Vendor Portal</h2>
+      <div class="sub">Third-party logistics portal embedding its own status widget.</div>
+      <div class="frame">
+        <iframe data-testid="vendor-status-iframe" title="Vendor status" src="/embed/vendor/status"></iframe>
+      </div>
+      <script>
+        window.addEventListener('message', function(e){
+          if(e.data && e.data.source==='acmedesk-vendor-status'){
+            parent.postMessage({source:'acmedesk-vendor', type:'status-refreshed', payload:e.data.payload}, '*');
+          }
+        });
+      </script>
+    </body></html>`;
+    return new HttpResponse(html, { headers: { 'Content-Type': 'text/html' } });
+  }),
+
+  http.get('/embed/vendor/status', async () => {
+    await delay(140);
+    const html = `<!doctype html><html><head><meta charset="utf-8"/><style>
+      body{font-family:system-ui,sans-serif;margin:0;padding:14px;background:#fff;color:#0f172a}
+      .lvl{display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#0891b2;background:#cffafe;border-radius:999px;padding:2px 8px;margin-bottom:8px}
+      .row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:13px}
+      .val{font-weight:700;color:#4f46e5}
+      button{background:#4f46e5;color:#fff;border:0;border-radius:8px;padding:8px 14px;cursor:pointer;font-size:13px;margin-top:12px}
+    </style></head><body>
+      <span class="lvl">level 2 iframe</span>
+      <div class="row"><span>In transit</span><span class="val" id="transit" data-testid="vendor-transit">42</span></div>
+      <div class="row"><span>Delivered today</span><span class="val" id="delivered">18</span></div>
+      <div class="row"><span>Exceptions</span><span class="val" id="exceptions">2</span></div>
+      <button id="refresh" data-testid="vendor-refresh">Refresh status</button>
+      <script>
+        var n = 0;
+        document.getElementById('refresh').addEventListener('click', function(){
+          n++;
+          document.getElementById('transit').textContent = 42 + n;
+          parent.postMessage({source:'acmedesk-vendor-status', payload:{transit:42+n}}, '*');
+        });
+      </script>
+    </body></html>`;
+    return new HttpResponse(html, { headers: { 'Content-Type': 'text/html' } });
+  }),
 ];

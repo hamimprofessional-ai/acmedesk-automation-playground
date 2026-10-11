@@ -10,6 +10,7 @@ import { CustomerDetail } from '@/pages/CustomerDetail';
 import { Inventory } from '@/pages/Inventory';
 import { Reports } from '@/pages/Reports';
 import { Settings } from '@/pages/Settings';
+import { Capabilities } from '@/pages/Capabilities';
 import { NotFound } from '@/pages/NotFound';
 import { PopoutWidget } from '@/pages/PopoutWidget';
 import { applyDocumentChrome, useUIStore } from '@/store/ui';
@@ -44,6 +45,7 @@ export default function App() {
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/capabilities" element={<Capabilities />} />
           <Route path="/404" element={<NotFound />} />
           <Route path="*" element={<Navigate to="/404" replace />} />
         </Route>

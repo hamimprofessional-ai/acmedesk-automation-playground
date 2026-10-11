@@ -192,8 +192,8 @@ export function Dashboard() {
           <iframe
             title="Embedded analytics"
             data-testid="analytics-iframe"
-            src="/embed/analytics"
-            className="h-64 w-full border-0 bg-slate-900"
+            src="https://practicetestautomation.com/practice-test-login/"
+            className="h-[32rem] w-full border-0 bg-white"
           />
         </div>
       </div>

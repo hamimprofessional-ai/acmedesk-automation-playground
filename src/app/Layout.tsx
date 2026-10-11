@@ -7,6 +7,7 @@ import {
   Boxes,
   FileBarChart,
   Settings as SettingsIcon,
+  ListChecks,
   Search,
   Moon,
   Sun,
@@ -26,6 +27,7 @@ const navItems = [
   { to: '/inventory', key: 'nav.inventory', icon: Boxes },
   { to: '/reports', key: 'nav.reports', icon: FileBarChart },
   { to: '/settings', key: 'nav.settings', icon: SettingsIcon },
+  { to: '/capabilities', key: 'nav.capabilities', icon: ListChecks },
 ];
 
 export function Layout() {
