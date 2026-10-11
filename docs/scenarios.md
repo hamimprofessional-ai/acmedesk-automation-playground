@@ -88,12 +88,14 @@ Tiers: `easy` · `medium` · `hard`.
 - **Tier:** medium
 - **Preconditions:** on `/tickets`
 - **Task:** Open a row's context menu (right-click or `MoreHorizontal`) → Delete; accept the confirm.
-- **Expected:** a **native `window.confirm`** appears; on OK the row is removed.
+- **Expected:** a **native `window.confirm`** appears; on OK the row is removed and a
+  **confirmation modal** (`[deleted-modal]`) appears instead of a toast.
 
 ### C4-02 — Bulk delete confirm
 - **Tier:** medium
 - **Task:** Select ≥2 rows → `[bulk-delete]`; accept.
-- **Expected:** native confirm names the count; selected tickets are deleted.
+- **Expected:** native confirm names the count; selected tickets are deleted and a
+  confirmation modal (`[deleted-modal]`) reports how many were deleted.
 
 ### C4-03 — Prompt to name a saved view
 - **Tier:** hard

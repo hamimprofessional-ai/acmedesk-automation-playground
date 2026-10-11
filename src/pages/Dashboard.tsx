@@ -176,7 +176,13 @@ export function Dashboard() {
                 <span>
                   <strong className="font-medium">{a.actor}</strong>{' '}
                   <span className="text-slate-500 dark:text-slate-400">{a.action}</span>{' '}
-                  <span className="font-mono text-xs text-brand-600 dark:text-brand-400">{a.target}</span>
+                  <Link
+                    to={`/tickets/${a.target}`}
+                    data-testid={`activity-ticket-${a.target}`}
+                    className="font-mono text-xs text-brand-600 hover:text-brand-500 hover:underline dark:text-brand-400 dark:hover:text-brand-300"
+                  >
+                    {a.target}
+                  </Link>
                 </span>
                 <span className="text-xs text-slate-400">{relativeTime(a.time)}</span>
               </li>

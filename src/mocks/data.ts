@@ -176,7 +176,7 @@ export const notifications: Notification[] = Array.from({ length: 8 }, () => ({
   read: faker.datatype.boolean(),
 }));
 
-export const activity: Activity[] = Array.from({ length: 12 }, () => ({
+export const activity: Activity[] = tickets.slice(0, 12).map((t) => ({
   id: faker.string.uuid(),
   actor: faker.helpers.arrayElement(ASSIGNEES),
   action: faker.helpers.arrayElement([
@@ -186,7 +186,7 @@ export const activity: Activity[] = Array.from({ length: 12 }, () => ({
     'closed',
     'reopened',
   ]),
-  target: `TCK-${faker.number.int({ min: 1000, max: 9999 })}`,
+  target: t.ref,
   time: iso(faker.date.recent({ days: 3 })),
 }));
 

@@ -26,6 +26,7 @@ import { Pagination } from '@/components/Pagination';
 import { LoadingBlock, ErrorState, EmptyState } from '@/components/States';
 import { ContextMenu, type ContextMenuItem } from '@/components/ContextMenu';
 import { DropdownMenu } from '@/components/DropdownMenu';
+import { Modal } from '@/components/Modal';
 import { KanbanBoard } from '@/features/tickets/KanbanBoard';
 import { SavedViews } from '@/features/tickets/SavedViews';
 
@@ -37,6 +38,7 @@ export function Tickets() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; ticket: Ticket } | null>(null);
   const [rowMenu, setRowMenu] = useState<{ anchor: DOMRect; ticket: Ticket } | null>(null);
+  const [deleted, setDeleted] = useState<{ ref?: string; count: number } | null>(null);
 
   const q = params.get('q') ?? '';
   const statuses = params.getAll('status');
@@ -166,7 +168,7 @@ export function Tickets() {
     if (window.confirm(`Delete ticket ${ref}? This cannot be undone.`)) {
       deleteMutation.mutate(id, {
         onSuccess: () => {
-          toast.success('Ticket deleted');
+          setDeleted({ ref, count: 1 });
           setSelected((s) => {
             const n = new Set(s);
             n.delete(id);
@@ -182,7 +184,7 @@ export function Tickets() {
     const ids = Array.from(selected);
     if (!window.confirm(`Delete ${ids.length} selected ticket(s)?`)) return;
     Promise.all(ids.map((id) => apiDelete(`/api/tickets/${id}`).catch(() => null))).then(() => {
-      toast.success(`${ids.length} ticket(s) deleted`);
+      setDeleted({ count: ids.length });
       setSelected(new Set());
       qc.invalidateQueries({ queryKey: ['tickets'] });
     });
@@ -464,14 +466,17 @@ export function Tickets() {
                         }
                       />
                     </td>
-                    <td className="px-3 py-2.5 font-mono text-xs text-slate-500">{t.ref}</td>
-                    <td className="max-w-xs px-3 py-2.5">
+                    <td className="px-3 py-2.5">
                       <Link
                         to={`/tickets/${t.id}`}
-                        className="font-medium hover:text-brand-600 dark:hover:text-brand-400"
+                        data-testid={`ticket-ref-${t.ref}`}
+                        className="font-mono text-xs text-brand-600 hover:text-brand-500 hover:underline dark:text-brand-400 dark:hover:text-brand-300"
                       >
-                        {t.subject}
+                        {t.ref}
                       </Link>
+                    </td>
+                    <td className="max-w-xs px-3 py-2.5">
+                      <span className="font-medium text-slate-800 dark:text-slate-100">{t.subject}</span>
                       {t.tags.length > 0 && (
                         <div className="mt-1 flex gap-1">
                           {t.tags.map((tag) => (
@@ -547,6 +552,38 @@ export function Tickets() {
           testId={`row-actions-menu-${rowMenu.ticket.ref}`}
           onClose={() => setRowMenu(null)}
         />
+      )}
+
+      {deleted && (
+        <Modal
+          open
+          size="sm"
+          testId="deleted-modal"
+          title="Ticket deleted"
+          description={
+            deleted.ref
+              ? `Ticket ${deleted.ref} has been deleted.`
+              : `${deleted.count} ticket(s) have been deleted.`
+          }
+          onClose={() => setDeleted(null)}
+          footer={
+            <button
+              type="button"
+              data-testid="deleted-ok"
+              className="btn-primary"
+              onClick={() => setDeleted(null)}
+            >
+              Done
+            </button>
+          }
+        >
+          <div className="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-300">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400">
+              <CheckCircle2 className="h-5 w-5" data-testid="deleted-icon" />
+            </span>
+            The change is already saved.
+          </div>
+        </Modal>
       )}
     </div>
   );
