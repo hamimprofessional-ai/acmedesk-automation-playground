@@ -46,3 +46,81 @@
     @apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium;
   }
 }
+
+/* Customizable <select> (Chrome/Edge 135+, Safari 27+): opt every native select
+   and its popup into the styleable "base" appearance so the options dropdown
+   gets the same rounded, themed treatment as the rest of the UI. Browsers that
+   don't support it simply keep their OS dropdown (progressive enhancement). */
+@supports (appearance: base-select) {
+  select,
+  ::picker(select) {
+    appearance: base-select;
+  }
+
+  /* base-select lays the control out as a flex row; without this the chevron
+     stretches to the full control height and looks broken. */
+  select {
+    align-items: center;
+  }
+
+  /* Keep the chevron pinned to the end of the control and theme its colour. */
+  select::picker-icon {
+    margin-inline-start: auto;
+    color: theme('colors.slate.400');
+    transition: transform 0.15s ease;
+  }
+  select:open::picker-icon {
+    transform: rotate(180deg);
+  }
+
+  ::picker(select) {
+    margin-top: 0.375rem;
+    padding: 0.25rem;
+    border: 1px solid theme('colors.slate.200');
+    border-radius: 0.75rem;
+    background-color: #fff;
+    box-shadow:
+      0 10px 15px -3px rgb(15 23 42 / 0.1),
+      0 4px 6px -4px rgb(15 23 42 / 0.1);
+  }
+
+  /* Separate each option with a bottom border only (divider), not a full box. */
+  option {
+    border-bottom: 1px solid theme('colors.slate.200');
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    color: theme('colors.slate.700');
+  }
+  option:last-child {
+    border-bottom: 0;
+  }
+  option:hover,
+  option:focus {
+    background-color: theme('colors.slate.100');
+  }
+  option:checked {
+    background-color: theme('colors.brand.50');
+    color: theme('colors.brand.800');
+    font-weight: 600;
+  }
+
+  html.dark ::picker(select) {
+    border-color: theme('colors.slate.800');
+    background-color: theme('colors.slate.900');
+    box-shadow:
+      0 10px 15px -3px rgb(0 0 0 / 0.6),
+      0 4px 6px -4px rgb(0 0 0 / 0.6);
+  }
+  html.dark option {
+    border-color: theme('colors.slate.700');
+    color: theme('colors.slate.200');
+  }
+  html.dark option:hover,
+  html.dark option:focus {
+    background-color: theme('colors.slate.800');
+  }
+  html.dark option:checked {
+    background-color: #1e1b4b;
+    color: theme('colors.brand.300');
+  }
+}

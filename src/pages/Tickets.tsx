@@ -498,7 +498,7 @@ export function Tickets() {
                     <td className="px-3 py-2.5 text-slate-500">{relativeTime(t.updatedAt)}</td>
                     <td className="px-3 py-2.5">
                       <div className="flex items-center justify-end gap-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
-                        <Tooltip label="Open in new tab" testId={`tooltip-newtab-${t.ref}`}>
+                        <Tooltip label="Open in new tab" align="end" testId={`tooltip-newtab-${t.ref}`}>
                           <a
                             href={`/tickets/${t.id}`}
                             target="_blank"
@@ -510,7 +510,7 @@ export function Tickets() {
                             <ExternalLink className="h-4 w-4" />
                           </a>
                         </Tooltip>
-                        <Tooltip label="More actions" testId={`tooltip-more-${t.ref}`}>
+                        <Tooltip label="More actions" align="end" testId={`tooltip-more-${t.ref}`}>
                           <button
                             type="button"
                             aria-label={`More actions for ${t.ref}`}

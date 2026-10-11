@@ -184,7 +184,7 @@ export function Layout() {
               data-testid="locale-switch"
               value={locale}
               onChange={(e) => setLocale(e.target.value as typeof locale)}
-              className="rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm dark:border-slate-700 dark:bg-slate-800"
+              className="me-2 h-9 rounded-lg border border-slate-300 bg-white px-2 text-sm dark:border-slate-700 dark:bg-slate-800"
             >
               {LOCALES.map((l) => (
                 <option key={l.code} value={l.code}>
