@@ -21,6 +21,47 @@ interface CapabilityGroup {
 
 const GROUPS: CapabilityGroup[] = [
   {
+    title: 'Accounts & session',
+    note: 'Authentication and the signed-in user profile.',
+    items: [
+      {
+        name: 'Two-step sign-in (credentials → one-time code)',
+        page: 'Login',
+        to: '/login',
+        trigger:
+          'Enter the test credentials (analyst / acmedesk123), then the 6-digit code (123456). Wrong input shows an inline error; "Back" returns to step 1.',
+        selector: 'data-testid="auth-step" / "login-submit" / "otp-submit" / "auth-back"',
+        tier: 'medium',
+      },
+      {
+        name: 'Auth-gated routes (redirect & return)',
+        page: 'Global',
+        to: '/tickets',
+        trigger:
+          'Visit a protected URL while signed out → redirected to /login; after signing in you land back on the page you requested.',
+        selector: 'data-testid="auth-step"',
+        tier: 'medium',
+      },
+      {
+        name: 'Persisted session & sign out',
+        page: 'Global (topbar)',
+        to: '/',
+        trigger: 'Reload keeps you signed in (localStorage); profile menu → "Sign out" returns to /login',
+        selector: 'data-testid="profile-menu-trigger" / "profile-menu"',
+        tier: 'easy',
+      },
+      {
+        name: 'Editable profile with validation & persistence',
+        page: 'Profile',
+        to: '/profile',
+        trigger:
+          'Edit name / contact / role fields → "Save profile"; clear Name or enter a bad email to trigger validation; "Reset" discards changes',
+        selector: 'data-testid="profile-save" / "profile-error" / "profile-reset"',
+        tier: 'easy',
+      },
+    ],
+  },
+  {
     title: 'Tabs & windows',
     items: [
       {
@@ -89,6 +130,14 @@ const GROUPS: CapabilityGroup[] = [
         selector: 'data-testid="global-search"',
         tier: 'medium',
       },
+      {
+        name: 'Master → detail pages',
+        page: 'Tickets / Customers / Orders',
+        to: '/customers',
+        trigger: 'Open any row → a detail page with related records and deep-linked sections',
+        selector: 'data-testid="customer-tickets"',
+        tier: 'easy',
+      },
     ],
   },
   {
@@ -101,6 +150,14 @@ const GROUPS: CapabilityGroup[] = [
         trigger: 'Bulk delete, delete a saved view',
         selector: 'data-testid="bulk-delete"',
         tier: 'medium',
+      },
+      {
+        name: 'Bulk selection toolbar',
+        page: 'Tickets',
+        to: '/tickets',
+        trigger: 'Tick row checkboxes (or the header select-all) → a bulk bar appears → bulk Delete asks for confirm()',
+        selector: 'data-testid="select-all" / "bulk-bar" / "bulk-delete"',
+        tier: 'easy',
       },
       {
         name: 'Native prompt()',
@@ -293,6 +350,42 @@ const GROUPS: CapabilityGroup[] = [
     ],
   },
   {
+    title: 'Dashboards & data viz',
+    items: [
+      {
+        name: 'Area & bar charts (Recharts / SVG)',
+        page: 'Dashboard',
+        to: '/',
+        trigger: 'Landing page → ticket-volume area chart and "tickets by category" bar chart',
+        tier: 'easy',
+      },
+      {
+        name: 'Recent activity feed',
+        page: 'Dashboard',
+        to: '/',
+        trigger: 'Landing page → "Recent activity" list; each entry deep-links to a ticket',
+        selector: 'data-testid="activity-feed"',
+        tier: 'easy',
+      },
+      {
+        name: 'Loading / empty / error states (with retry)',
+        page: 'Customers',
+        to: '/customers',
+        trigger: 'Load a list → spinner, then empty-state or error-state with a Retry button',
+        selector: 'data-testid="loading" / "empty-state" / "error-state"',
+        tier: 'easy',
+      },
+      {
+        name: 'Auto-refreshing pop-out window',
+        page: 'Dashboard / pop-out',
+        to: '/',
+        trigger: 'Dashboard → "Pop out widget"; the window self-refreshes on a timer',
+        selector: 'data-testid="popout-widget" / "popout-auto-refresh"',
+        tier: 'medium',
+      },
+    ],
+  },
+  {
     title: 'Advanced DOM & edge cases',
     note: 'These deliberately exercise tricky selectors and edge cases.',
     items: [
@@ -449,6 +542,30 @@ const GROUPS: CapabilityGroup[] = [
         selector: 'data-testid="tooltip-theme" / "tooltip-notifications"',
         tier: 'easy',
       },
+      {
+        name: 'Ticket conversation (post a comment)',
+        page: 'Ticket detail',
+        to: '/tickets',
+        trigger: 'Open a ticket → type in the comment box → Send (toast confirms)',
+        selector: 'data-testid="comment-input" / "send-comment" / "comment-list"',
+        tier: 'easy',
+      },
+      {
+        name: 'Inline status change (select)',
+        page: 'Ticket detail',
+        to: '/tickets',
+        trigger: 'Open a ticket → change Status in the header dropdown; the badge updates',
+        selector: 'data-testid="status-select"',
+        tier: 'easy',
+      },
+      {
+        name: 'Re-show the consent banner',
+        page: 'Settings',
+        to: '/settings',
+        trigger: 'Privacy panel → "Reset consent banner"; the bottom banner reappears',
+        selector: 'data-testid="reset-consent" / "consent-banner"',
+        tier: 'easy',
+      },
     ],
   },
   {
@@ -506,7 +623,7 @@ const GROUPS: CapabilityGroup[] = [
       {
         name: 'Detached & self-resetting DOM',
         page: 'Challenge Lab',
-        to: '/challenges/detached',
+        to: '/challenges/detached-dom',
         trigger: 'Pause the refresh, then click a row; save a note before it clears',
         selector: 'li.row:has-text("UMBR")',
         tier: 'hard',
