@@ -36,12 +36,32 @@ export default {
           '70%': { opacity: '1' },
           '100%': { opacity: '0' },
         },
+        'logo-glow': {
+          '0%, 100%': { opacity: '0.3', transform: 'scale(0.85)' },
+          '50%': { opacity: '0.7', transform: 'scale(1.15)' },
+        },
+        'logo-mark': {
+          '0%, 100%': { transform: 'scale(1) rotate(0deg)' },
+          '50%': { transform: 'scale(1.06) rotate(6deg)' },
+        },
+        'logo-twinkle': {
+          '0%, 100%': { opacity: '0.35', transform: 'scale(0.65)' },
+          '50%': { opacity: '1', transform: 'scale(1.05)' },
+        },
+        'logo-text': {
+          '0%': { backgroundPosition: '200% center' },
+          '100%': { backgroundPosition: '-200% center' },
+        },
       },
       animation: {
         'slide-in': 'slide-in 0.25s ease-out',
         'fade-in': 'fade-in 0.2s ease-out',
         'scale-in': 'scale-in 0.15s ease-out',
         'flash': 'flash 0.9s ease-in forwards',
+        'logo-glow': 'logo-glow 3s ease-in-out infinite',
+        'logo-mark': 'logo-mark 4.5s ease-in-out infinite',
+        'logo-twinkle': 'logo-twinkle 2.6s ease-in-out infinite',
+        'logo-text': 'logo-text 4s linear infinite',
       },
     },
   },

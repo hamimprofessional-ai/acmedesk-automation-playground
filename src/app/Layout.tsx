@@ -28,6 +28,7 @@ import { ConsentBanner } from '@/components/ConsentBanner';
 import { ToastHost } from '@/components/ToastHost';
 import { HoverClickDropdown } from '@/components/HoverClickDropdown';
 import { Tooltip } from '@/components/Tooltip';
+import { Logo } from '@/components/Logo';
 import { cn } from '@/lib/cn';
 import { useMediaQuery } from '@/lib/useMediaQuery';
 
@@ -118,11 +119,8 @@ export function Layout() {
         data-testid="sidebar"
         data-sidebar-pinned={pinned ? 'true' : 'false'}
       >
-        <Link to="/" className="flex items-center gap-2 px-5 py-5">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 font-bold text-white">
-            A
-          </span>
-          <span className="text-lg font-semibold tracking-tight">AcmeDesk</span>
+        <Link to="/" className="px-5 py-5" aria-label="AcmeDesk home">
+          <Logo />
         </Link>
         <nav className="flex-1 space-y-1 px-3 py-2" aria-label="Primary">
           {navItems.map(({ to, key, icon: Icon, end }) => (
