@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import DOMPurify from 'dompurify';
 import {
   ArrowLeft,
   Download,
@@ -165,9 +166,11 @@ export function TicketDetail() {
         <div className="space-y-4 lg:col-span-2">
           <div className="card p-5">
             <h2 className="mb-2 text-sm font-semibold">Description</h2>
-            <p className="whitespace-pre-wrap text-sm text-slate-600 dark:text-slate-300">
-              {ticket.description}
-            </p>
+            <div
+              data-testid="ticket-description"
+              className="rte-content whitespace-pre-wrap text-sm text-slate-600 dark:text-slate-300"
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(ticket.description) }}
+            />
           </div>
 
           <div className="card p-5">
