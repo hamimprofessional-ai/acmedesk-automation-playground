@@ -25,7 +25,7 @@ export function NativePromptsChallenge() {
         'Trigger the alert and accept it.',
         'Trigger the confirm and choose OK; verify the result text.',
         'Trigger the prompt, type a value and accept; verify it is echoed back.',
-        'Toggle the "warn before leaving" guard and try to navigate away.',
+        'Toggle the "warn before leaving" guard, then do a hard refresh or close the tab (in-app navigation will not trigger it).',
       ]}
       selector='page.on("dialog", d => d.accept("Ada"))'
     >

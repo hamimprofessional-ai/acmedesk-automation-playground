@@ -25,6 +25,18 @@ export class ApiError extends Error {
   }
 }
 
+const MAX_ATTEMPTS = 3;
+
+// When the mock service worker hasn't taken control yet, requests fall through
+// to the SPA fallback and come back as the app's HTML instead of JSON.
+function isHtmlResponse(res: Response): boolean {
+  return (res.headers.get('content-type') ?? '').toLowerCase().includes('text/html');
+}
+
+function wait(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function handle<T>(res: Response): Promise<T> {
   if (!res.ok) {
     let message = `Request failed (${res.status})`;
@@ -36,41 +48,48 @@ async function handle<T>(res: Response): Promise<T> {
     }
     throw new ApiError(message, res.status);
   }
+  if (isHtmlResponse(res)) {
+    throw new ApiError('The app is still starting up. Please refresh and try again.', res.status);
+  }
   const text = await res.text();
   return text ? (JSON.parse(text) as T) : (undefined as T);
 }
 
-export async function apiGet<T>(path: string, params?: QueryParams): Promise<T> {
-  const res = await fetch(buildUrl(path, params));
+async function request<T>(input: string, init?: RequestInit): Promise<T> {
+  let res = await fetch(input, init);
+  for (let attempt = 1; attempt < MAX_ATTEMPTS && res.ok && isHtmlResponse(res); attempt++) {
+    await wait(attempt * 250);
+    res = await fetch(input, init);
+  }
   return handle<T>(res);
 }
 
+export async function apiGet<T>(path: string, params?: QueryParams): Promise<T> {
+  return request<T>(buildUrl(path, params));
+}
+
 export async function apiPost<T>(path: string, body?: unknown): Promise<T> {
-  const res = await fetch(path, {
+  return request<T>(path, {
     method: 'POST',
     headers: body ? { 'Content-Type': 'application/json' } : undefined,
     body: body ? JSON.stringify(body) : undefined,
   });
-  return handle<T>(res);
 }
 
 export async function apiPatch<T>(path: string, body?: unknown): Promise<T> {
-  const res = await fetch(path, {
+  return request<T>(path, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body ?? {}),
   });
-  return handle<T>(res);
 }
 
 export async function apiDelete<T>(path: string): Promise<T> {
-  const res = await fetch(path, { method: 'DELETE' });
-  return handle<T>(res);
+  return request<T>(path, { method: 'DELETE' });
 }
 
 export async function apiUpload<T>(path: string, files: File[]): Promise<T> {
   const form = new FormData();
   files.forEach((f) => form.append('files', f));
-  const res = await fetch(path, { method: 'POST', body: form });
-  return handle<T>(res);
+  return request<T>(path, { method: 'POST', body: form });
 }
