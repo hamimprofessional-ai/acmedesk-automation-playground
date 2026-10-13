@@ -9,6 +9,7 @@ import {
   Save,
   UserRound,
 } from 'lucide-react';
+import { RichTextEditor } from '@/components/RichTextEditor';
 import { initialsOf, useAuthStore, type ProfileFields } from '@/store/auth';
 import { toast } from '@/store/toast';
 
@@ -228,15 +229,11 @@ export function Profile() {
             <label className="label" htmlFor="bio">
               Bio
             </label>
-            <textarea
-              id="bio"
-              name="bio"
-              rows={3}
-              className="input"
-              placeholder="A short note about you…"
+            <RichTextEditor
+              testId="profile-bio"
               value={form.bio}
-              onChange={(e) => update('bio', e.target.value)}
-              data-testid="profile-bio"
+              onChange={(html) => update('bio', html)}
+              placeholder="A short note about you…"
             />
           </div>
 

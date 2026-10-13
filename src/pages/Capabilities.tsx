@@ -498,8 +498,10 @@ const GROUPS: CapabilityGroup[] = [
         name: 'Rich text editor (contentEditable + toolbar)',
         page: 'Ticket wizard',
         to: '/tickets/new',
-        trigger: 'Step 2 → select text and click B / I / U / list buttons in the description editor',
-        selector: 'data-testid="wizard-description-editor" / "wizard-description-bold"',
+        trigger:
+          'Step 2 → select text and click a toolbar button in the description editor (bold, italic, underline, strikethrough, headings, quote, code, lists, indent, alignment, link, rule, clear, undo/redo)',
+        selector:
+          'data-testid="wizard-description-editor", "wizard-description-bold", "wizard-description-h1" … "wizard-description-link"',
         tier: 'medium',
       },
       {
