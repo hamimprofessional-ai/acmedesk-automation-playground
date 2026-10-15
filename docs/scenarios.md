@@ -576,6 +576,16 @@ production pages (which keep stable ids). Hub: `/challenges`.
   the canvas bounding box (e.g. `mouse.click(x, y)` or a dispatched pointer sequence), and the
   signature must be drawn via pointer move events.
 
+### C17-15 — Stale element references
+
+- **Tier:** hard → `/challenges/stale-elements`
+- **Task:** Pin the row with `[data-ref="PIN-0042"]`. Repeat with **Auto-refresh** enabled
+  (every 2.6 s), then use **Refresh list** and click **Pin** on `PIN-0042` again.
+- **Expected:** each refresh rebuilds every row node, so a handle captured before the rebuild
+  detaches — clicking it fails until the row is re-located. For ~0.7 s after a rebuild the
+  outgoing rows linger (fading out, `pointer-events-none`) alongside the new ones, so
+  `data-ref`/text locators match **two** elements at once and a strict locator throws.
+
 ---
 
 ## C18 - Orders & fulfillment
