@@ -456,7 +456,7 @@ production pages (which keep stable ids). Hub: `/challenges`.
 - **Expected:** clicks on the covered button are intercepted until the overlay is dismissed.
 
 ### C17-07 — Detached & self-resetting DOM
-- **Tier:** hard → `/challenges/detached`
+- **Tier:** hard → `/challenges/detached-dom`
 - **Task:** Pause the refresh, click the **UMBR** ticker; type a note and **Save** before it
   clears; click **Claim bonus** before the banner removes itself (~2.5 s).
 - **Expected:** element handles go stale on re-render; the note field self-clears every 5 s
@@ -490,6 +490,14 @@ production pages (which keep stable ids). Hub: `/challenges`.
 - **Task:** Reorder the checklist so **Review metrics** is first; drag **Ship it** into **Done**.
 - **Expected:** HTML5 drag events (`dragstart`/`dragover`/`drop`) via `dragTo()` or a synthesized
   event sequence.
+
+### C17-13 — Infinite scroll & lazy loading
+- **Tier:** medium → `/challenges/infinite-scroll`
+- **Task:** Scroll the inner feed container (`[data-testid="feed-scroll"]`) repeatedly until
+  `[data-testid="feed-end"]` appears, then click the row with `[data-ref="LOG-0054"]`.
+- **Expected:** paging is driven by an `IntersectionObserver` sentinel, not a button, and only
+  fires when the **container** (not the window) is scrolled; rows share repeated messages, so
+  text-based locators are ambiguous and you must scroll-until-present rather than sleeping.
 
 ---
 

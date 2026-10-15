@@ -670,6 +670,14 @@ const GROUPS: CapabilityGroup[] = [
         selector: 'locator.dragTo() or a dispatchEvent drag sequence',
         tier: 'hard',
       },
+      {
+        name: 'Infinite scroll & lazy loading',
+        page: 'Challenge Lab',
+        to: '/challenges/infinite-scroll',
+        trigger: 'Scroll the inner feed until "End of feed", then click row LOG-0054',
+        selector: '[data-testid="feed-scroll"] >> [data-ref="LOG-0054"]',
+        tier: 'medium',
+      },
     ],
   },
   {
