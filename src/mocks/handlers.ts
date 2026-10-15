@@ -803,6 +803,36 @@ export const handlers = [
     return ok({ ok: true });
   }),
 
+  http.get('/api/challenges/feed', async ({ request }) => {
+    const url = new URL(request.url);
+    const page = Math.max(1, Number(url.searchParams.get('page') ?? 1));
+    const pageSize = 10;
+    const total = 54;
+    await delay(350 + Math.random() * 450);
+    const start = (page - 1) * pageSize;
+    const count = Math.max(0, Math.min(pageSize, total - start));
+    const messages = [
+      'Heartbeat OK',
+      'Records synced',
+      'Cache warmed',
+      'Index rebuilt',
+      'Webhook delivered',
+      'Backup completed',
+    ];
+    const items = Array.from({ length: count }, (_, i) => {
+      const n = start + i + 1;
+      const isTarget = n === total;
+      return {
+        id: `log-${String(n).padStart(3, '0')}`,
+        ref: `LOG-${String(n).padStart(4, '0')}`,
+        message: isTarget ? 'CRITICAL: cache stampede detected' : messages[n % messages.length],
+        level: isTarget ? 'error' : n % 7 === 0 ? 'warn' : 'info',
+        at: new Date(Date.UTC(2026, 0, 1) + n * 60000).toISOString(),
+      };
+    });
+    return ok({ items, page, pageSize, total, hasMore: start + count < total });
+  }),
+
   // ----- Nested iframe: vendor portal (level 1) embedding status widget (level 2) --
   http.get('/embed/vendor', async () => {
     await delay(180);

@@ -13,6 +13,7 @@ import { NativePromptsChallenge } from './items/NativePromptsChallenge';
 import { LogicGateChallenge } from './items/LogicGateChallenge';
 import { DragDropChallenge } from './items/DragDropChallenge';
 import { CanvasChallenge } from './items/CanvasChallenge';
+import { InfiniteScrollChallenge } from './items/InfiniteScrollChallenge';
 
 export interface Challenge {
   slug: string;
@@ -127,6 +128,14 @@ export const CHALLENGES: Challenge[] = [
     tier: 'hard',
     tags: ['canvas', 'coordinates', 'screenshots'],
     Component: CanvasChallenge,
+   },
+   {
+    slug: 'infinite-scroll',
+    title: 'Infinite scroll & lazy loading',
+    blurb: 'An inner container streams paged rows as you scroll; no Load-more button.',
+    tier: 'medium',
+    tags: ['infinite-scroll', 'lazy-load', 'scrolling'],
+    Component: InfiniteScrollChallenge,
   },
 ];
 
