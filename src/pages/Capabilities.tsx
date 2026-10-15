@@ -670,6 +670,14 @@ const GROUPS: CapabilityGroup[] = [
         selector: 'locator.dragTo() or a dispatchEvent drag sequence',
         tier: 'hard',
       },
+      {
+        name: 'Canvas & coordinate targeting',
+        page: 'Challenge Lab',
+        to: '/challenges/canvas',
+        trigger: 'Click the moving dot to 3/3; drag a signature and confirm',
+        selector: 'canvas[data-testid="canvas-board"] · mouse.click(x, y)',
+        tier: 'hard',
+      },
     ],
   },
   {

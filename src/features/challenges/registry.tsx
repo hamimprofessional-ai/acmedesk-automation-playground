@@ -12,6 +12,7 @@ import { FlakyNetworkChallenge } from './items/FlakyNetworkChallenge';
 import { NativePromptsChallenge } from './items/NativePromptsChallenge';
 import { LogicGateChallenge } from './items/LogicGateChallenge';
 import { DragDropChallenge } from './items/DragDropChallenge';
+import { CanvasChallenge } from './items/CanvasChallenge';
 
 export interface Challenge {
   slug: string;
@@ -118,6 +119,14 @@ export const CHALLENGES: Challenge[] = [
     tier: 'hard',
     tags: ['drag-drop', 'interactions'],
     Component: DragDropChallenge,
+  },
+  {
+    slug: 'canvas',
+    title: 'Canvas & coordinate targeting',
+    blurb: 'Painted targets and a signature pad — no DOM elements, only pixels.',
+    tier: 'hard',
+    tags: ['canvas', 'coordinates', 'screenshots'],
+    Component: CanvasChallenge,
   },
 ];
 

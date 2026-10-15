@@ -491,6 +491,16 @@ production pages (which keep stable ids). Hub: `/challenges`.
 - **Expected:** HTML5 drag events (`dragstart`/`dragover`/`drop`) via `dragTo()` or a synthesized
   event sequence.
 
+### C17-13 — Canvas & coordinate targeting
+- **Tier:** hard → `/challenges/canvas`
+- **Task:** Click the dot painted on `canvas[data-testid="canvas-board"]` until the score reads
+  **3/3** (it relocates every 0.9 s); then drag a stroke on
+  `canvas[data-testid="canvas-signature"]` and click **Confirm signature**.
+- **Expected:** the dot and the running score/miss counter exist only as pixels — the DOM
+  exposes no elements or text, so locators cannot find them. Coordinates must be derived from
+  the canvas bounding box (e.g. `mouse.click(x, y)` or a dispatched pointer sequence), and the
+  signature must be drawn via pointer move events.
+
 ---
 
 ## C18 - Orders & fulfillment
