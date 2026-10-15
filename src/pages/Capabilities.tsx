@@ -719,6 +719,16 @@ const GROUPS: CapabilityGroup[] = [
         selector: 'canvas[data-testid="canvas-board"] · mouse.click(x, y)',
         tier: "hard",
       },
+      {
+        name: "Stale element references",
+        page: "Challenge Lab",
+        to: "/challenges/stale-elements",
+        trigger:
+          "Pin row PIN-0042 while Auto-refresh rebuilds and fades out rows",
+        selector:
+          '[data-testid="stale-list"] [data-ref="PIN-0042"]:not(.leaving)',
+        tier: "hard",
+      },
     ],
   },
   {

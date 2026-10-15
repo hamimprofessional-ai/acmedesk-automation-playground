@@ -14,6 +14,7 @@ import { LogicGateChallenge } from "./items/LogicGateChallenge";
 import { DragDropChallenge } from "./items/DragDropChallenge";
 import { InfiniteScrollChallenge } from "./items/InfiniteScrollChallenge";
 import { CanvasChallenge } from "./items/CanvasChallenge";
+import { StaleElementChallenge } from "./items/StaleElementChallenge";
 
 export interface Challenge {
   slug: string;
@@ -145,6 +146,15 @@ export const CHALLENGES: Challenge[] = [
     tier: "hard",
     tags: ["canvas", "coordinates", "screenshots"],
     Component: CanvasChallenge,
+  },
+  {
+    slug: "stale-elements",
+    title: "Stale element references",
+    blurb:
+      "Rows are rebuilt on every refresh and linger while fading out, so handles detach and locators briefly match twice.",
+    tier: "hard",
+    tags: ["stale-element", "rerender", "transitions"],
+    Component: StaleElementChallenge,
   },
 ];
 
