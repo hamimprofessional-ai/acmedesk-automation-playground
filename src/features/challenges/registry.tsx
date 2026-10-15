@@ -12,6 +12,7 @@ import { FlakyNetworkChallenge } from './items/FlakyNetworkChallenge';
 import { NativePromptsChallenge } from './items/NativePromptsChallenge';
 import { LogicGateChallenge } from './items/LogicGateChallenge';
 import { DragDropChallenge } from './items/DragDropChallenge';
+import { InfiniteScrollChallenge } from './items/InfiniteScrollChallenge';
 
 export interface Challenge {
   slug: string;
@@ -118,6 +119,14 @@ export const CHALLENGES: Challenge[] = [
     tier: 'hard',
     tags: ['drag-drop', 'interactions'],
     Component: DragDropChallenge,
+  },
+  {
+    slug: 'infinite-scroll',
+    title: 'Infinite scroll & lazy loading',
+    blurb: 'An inner container streams paged rows as you scroll; no Load-more button.',
+    tier: 'medium',
+    tags: ['infinite-scroll', 'lazy-load', 'scrolling'],
+    Component: InfiniteScrollChallenge,
   },
 ];
 
